@@ -1,0 +1,54 @@
+# Laravel / PHP
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+/.env
+/.env.*
+/.phpunit.result.cache
+
+# Laravel specific storage/cache (keep gitignore files if present)
+/storage/framework/*
+!/storage/framework/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Build outputs
+/public/build/
+/public/hot
+
+# Composer and build artifacts
+# (Do not ignore composer.lock for application stability)
+
+# Node & package managers
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+/pnpm-debug.log*
+
+# IDEs and editors
+/.idea/
+/.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+/.docker/
+docker-compose.override.yml
+
+# Vagrant
+/.vagrant/
+
+# Coverage, reports and misc
+/coverage/
+/phpunit-result.xml
+/build/
+
+# Misc
+*.log
+*.cache
+/project/
