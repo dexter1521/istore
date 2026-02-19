@@ -4,10 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>iStore Admin</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    @vite(['resources/sass/main.scss', 'resources/js/main.js'])
 
     <style>
         body {
@@ -27,23 +26,19 @@
             bottom: 0;
             left: 0;
             z-index: 100;
-            padding: 48px 0 0;
+            padding: 56px 0 0; /* Altura del navbar */
             box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            overflow-y: auto;
         }
 
         @media (max-width: 767.98px) {
             .sidebar {
-                top: 5rem;
+                top: 0;
+                width: 100%;
+                height: auto;
+                background-color: #f8f9fa;
+                border-bottom: 1px solid #dee2e6;
             }
-        }
-
-        .sidebar-sticky {
-            position: relative;
-            top: 0;
-            height: calc(100vh - 48px);
-            padding-top: .5rem;
-            overflow-x: hidden;
-            overflow-y: auto;
         }
 
         .nav-link {
@@ -68,12 +63,39 @@
         .nav-link.active .feather {
             color: inherit;
         }
+
+        /* Asegurar que el header quede por encima y la sidebar no solape el contenido */
+        header.navbar {
+            z-index: 1030;
+        }
+
+        /* Posicionamiento del botón hamburguesa en móviles */
+        .navbar .navbar-toggler {
+            top: .25rem;
+            right: 1rem;
+        }
+
+        /* Ancho fijo de la sidebar en pantallas medias/anchas y dejar espacio al main */
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 240px;
+            }
+
+            main {
+                margin-left: 240px;
+            }
+        }
+
+        /* Espaciado para el contenido principal */
+        main {
+            padding-top: 56px;
+        }
     </style>
 </head>
 
 <body>
 
-    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <header class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">iStore Admin</a>
         <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
             data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
@@ -136,7 +158,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script>
         feather.replace()
