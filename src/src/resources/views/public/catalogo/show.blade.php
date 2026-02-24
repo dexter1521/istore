@@ -56,9 +56,9 @@
                 </p>
             @endif
 
-            @if($producto->mostrar_precio)
+            @if(show_prices() && $producto->mostrar_precio)
                 <h3 class="text-success mb-4">
-                    ${{ number_format($producto->precio ?? 0, 2) }}
+                    {{ currency_symbol() }}{{ number_format($producto->precio ?? 0, 2) }}
                 </h3>
             @endif
 

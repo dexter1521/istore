@@ -52,6 +52,18 @@
 
                 <div class="card mb-3">
                     <div class="card-header">
+                        <h5 class="mb-0">Precios</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="mostrar_precios" name="mostrar_precios" {{ (($settings['mostrar_precios'] ?? '1') == '1') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="mostrar_precios">Mostrar precios en la tienda</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">
                         <h5 class="mb-0">WhatsApp</h5>
                     </div>
                     <div class="card-body">

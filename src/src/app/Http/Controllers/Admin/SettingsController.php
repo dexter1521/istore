@@ -30,6 +30,10 @@ class SettingsController extends Controller
             );
         }
 
+        // Checkbox para mostrar precios (si no viene, guardamos 0)
+        $mostrar = $request->has('mostrar_precios') ? '1' : '0';
+        Setting::updateOrCreate(['clave' => 'mostrar_precios'], ['valor' => $mostrar]);
+
         return redirect()->route('admin.settings.index')->with('success', 'Configuración actualizada exitosamente.');
     }
 }

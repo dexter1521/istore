@@ -2,7 +2,27 @@
 
 @section('content')
 
-    <h2 class="mb-4">Catálogo de Productos</h2>
+    <h2 class="mb-3">Catálogo de Productos</h2>
+
+    @php
+        $filtroNombre = null;
+        if(request()->filled('q')) {
+            $filtroNombre = "'".e(request('q'))."'";
+        }
+        $filtroCategoria = null;
+        if(request()->routeIs('categorias.show')) {
+            // Intentar resolver nombre de categoría desde la colección compartida
+            $cat = collect($categorias ?? [])->firstWhere('id', request()->route('id'));
+            $filtroCategoria = $cat ? $cat->nombre : null;
+        } elseif(request()->filled('categoria')) {
+            $cat = collect($categorias ?? [])->firstWhere('id', request('categoria'));
+            $filtroCategoria = $cat ? $cat->nombre : null;
+        }
+    @endphp
+
+    @if($filtroNombre || $filtroCategoria)
+        <p class="text-muted mb-4">Resultados @if($filtroNombre) para {{ $filtroNombre }}@endif @if($filtroCategoria) @if($filtroNombre) en @else para @endif la categoría "{{ $filtroCategoria }}"@endif</p>
+    @endif
 
     <div class="row">
         @forelse($productos as $producto)
@@ -16,9 +36,9 @@
                             </a>
                         </h6>
 
-                        @if($producto->mostrar_precio)
+                        @if(show_prices() && $producto->mostrar_precio)
                             <p class="text-success fw-bold">
-                                ${{ number_format($producto->precio ?? 0, 2) }}
+                                {{ currency_symbol() }}{{ number_format($producto->precio ?? 0, 2) }}
                             </p>
                         @endif
 

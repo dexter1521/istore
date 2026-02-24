@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [CatalogoController::class, 'index'])->name('home');
 Route::get('/producto/{id}', [CatalogoController::class, 'show'])->name('producto.show');
 
+// Ruta pública para mostrar/filtrar por categoría
+Route::get('/categoria/{id}', [CatalogoController::class, 'categoria'])->name('categorias.show');
+
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
 Route::post('/carrito/agregar', [CarritoController::class, 'agregar'])->name('carrito.agregar');
 Route::post('/carrito/actualizar', [CarritoController::class, 'actualizar'])->name('carrito.actualizar');
@@ -46,6 +49,9 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
     Route::resource('categorias', \App\Http\Controllers\Admin\CategoriaController::class);
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+    // Pedidos (Kanban)
+    Route::get('/pedidos/kanban', [\App\Http\Controllers\Admin\PedidoController::class, 'kanban'])->name('pedidos.kanban');
+    Route::patch('/pedidos/{pedido}/estado', [\App\Http\Controllers\Admin\PedidoController::class, 'updateEstado'])->name('pedidos.updateEstado');
 });
 
 require __DIR__ . '/auth.php';

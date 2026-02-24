@@ -12,3 +12,24 @@ if (!function_exists('setting')) {
         });
     }
 }
+
+if (!function_exists('currency_symbol')) {
+    function currency_symbol($currency = null)
+    {
+        $code = $currency ?? setting('moneda', 'USD');
+        return match (strtoupper($code)) {
+            'USD' => '$',
+            'MXN' => '$',
+            'EUR' => '€',
+            'GBP' => '£',
+            default => '$',
+        };
+    }
+}
+
+if (!function_exists('show_prices')) {
+    function show_prices(): bool
+    {
+        return (bool) (setting('mostrar_precios', '1') == '1');
+    }
+}

@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    @vite(['resources/sass/main.scss', 'resources/js/main.js'])
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body {
@@ -26,7 +27,8 @@
             bottom: 0;
             left: 0;
             z-index: 100;
-            padding: 56px 0 0; /* Altura del navbar */
+            padding: 56px 0 0;
+            /* Altura del navbar */
             box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
             overflow-y: auto;
         }
@@ -158,6 +160,8 @@
         </div>
     </div>
 
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script>
         feather.replace()

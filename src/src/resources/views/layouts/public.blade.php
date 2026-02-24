@@ -36,6 +36,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">Inicio</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Categorías</a>
+                        <ul class="dropdown-menu">
+                            @if(isset($categorias) && $categorias->count())
+                                @foreach($categorias as $categoria)
+                                    <li><a class="dropdown-item" href="{{ route('categorias.show', $categoria->id) }}">{{ $categoria->nombre }}</a></li>
+                                @endforeach
+                            @else
+                                <li><span class="dropdown-item-text">No hay categorías</span></li>
+                            @endif
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('carrito.index') }}">Carrito</a>
                     </li>
@@ -54,6 +66,13 @@
                     @endif
                     @endauth
                 </ul>
+                <form class="d-flex" method="GET" action="{{ route('home') }}">
+                    @if(request()->has('categoria'))
+                        <input type="hidden" name="categoria" value="{{ request('categoria') }}">
+                    @endif
+                    <input class="form-control me-2" type="search" name="q" value="{{ request('q') }}" placeholder="Buscar">
+                    <button class="btn btn-primary" type="submit">Buscar</button>
+                </form>
             </div>
         </div>
     </nav>
