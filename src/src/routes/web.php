@@ -50,8 +50,9 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     // Pedidos (Kanban)
-    Route::get('/pedidos/kanban', [\App\Http\Controllers\Admin\PedidoController::class, 'kanban'])->name('pedidos.kanban');
-    Route::patch('/pedidos/{pedido}/estado', [\App\Http\Controllers\Admin\PedidoController::class, 'updateEstado'])->name('pedidos.updateEstado');
+    Route::get('/pedidos', [\App\Http\Controllers\Admin\PedidoController::class, 'kanban'])->name('pedidos.kanban');
+    Route::get('/pedidos/{pedido}', [\App\Http\Controllers\Admin\PedidoController::class, 'show'])->name('pedidos.show');
+    Route::post('/pedidos/{pedido}/estado', [\App\Http\Controllers\Admin\PedidoController::class, 'updateEstado'])->name('pedidos.update-estado');
 });
 
 require __DIR__ . '/auth.php';
