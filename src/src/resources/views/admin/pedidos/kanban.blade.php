@@ -1,247 +1,151 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">{{ __('Tablero de Pedidos') }}</h1>
-</div>
+<div class="container-fluid h-100">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 text-gray-800">Tablero de Pedidos</h1>
+        <span class="text-muted small">Arrastra las tarjetas para cambiar el estado</span>
+    </div>
 
-<div class="container-fluid p-0">
-    <div class="row flex-nowrap overflow-auto pb-4" style="min-height: 75vh;">
+    <!-- Contenedor con scroll horizontal para las columnas -->
+    <div class="row flex-nowrap overflow-auto pb-4" style="min-height: 80vh;">
         @foreach($estados as $estado)
-        <div class="col-12 col-md-6 col-lg-3" style="min-width: 320px;">
-            <div class="card h-100 bg-light border-0 shadow-sm">
-                <!-- Encabezado de Columna -->
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3 sticky-top" style="border-top: 3px solid var(--bs-{{ $estado->color ?? 'secondary' }});">
-                    <h6 class="mb-0 fw-bold text-uppercase text-muted small" style="letter-spacing: 0.5px; color: var(--bs-{{ $estado->color }}) !important;">
+            <div class="col-10 col-md-4 col-xl-3 px-2">
+                <div class="card h-100 shadow-sm bg-light">
+                    <!-- Encabezado de Columna -->
+                    <div class="card-header border-top-{{ $estado->color }} bg-white font-weight-bold text-uppercase text-{{ $estado->color }} d-flex justify-content-between align-items-center">
                         {{ $estado->nombre }}
-                    </h6>
-                    <span class="badge bg-{{ $estado->color ?? 'secondary' }} rounded-pill count-badge" data-status-id="{{ $estado->id }}">
-                        {{ $pedidosPorEstado[$estado->slug]->count() }}
-                    </span>
-                </div>
-
-                <!-- Zona de Drop -->
-                <div class="card-body p-2 kanban-column overflow-auto" data-status-id="{{ $estado->id }}" style="max-height: 70vh;">
-                    @foreach($pedidosPorEstado[$estado->slug] as $pedido)
-                    <div class="card mb-2 border-0 shadow-sm kanban-card" style="cursor: grab;" data-id="{{ $pedido->id }}">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge bg-light text-dark border">#{{ str_pad($pedido->id, 5, '0', STR_PAD_LEFT) }}</span>
-                                <small class="text-muted" style="font-size: 0.8rem;">{{ $pedido->created_at->diffForHumans() }}</small>
-                            </div>
-
-                            <h6 class="card-title mb-1 text-truncate" title="{{ $pedido->cliente_nombre }}">
-                                {{ $pedido->cliente_nombre ?? 'Cliente Invitado' }}
-                            </h6>
-
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <small class="text-muted">{{ $pedido->items->count() }} ítems</small>
-                                <span class="fw-bold text-success">${{ number_format($pedido->total ?? 0, 2) }}</span>
-                            </div>
-
-                            <div class="mt-2 pt-2 border-top text-end">
-                                <button class="btn btn-sm btn-outline-primary btn-ver-detalle" data-id="{{ $pedido->id }}">
-                                    Ver Detalle
-                                </button>
-                            </div>
-                        </div>
+                        <span class="badge badge-pill badge-light border">{{ $pedidosPorEstado[$estado->slug]->count() }}</span>
                     </div>
-                    @endforeach
+
+                    <!-- Zona de Drop -->
+                    <div class="card-body p-2 kanban-column overflow-auto"
+                         data-estado-id="{{ $estado->id }}"
+                         style="max-height: 75vh;">
+
+                        @foreach($pedidosPorEstado[$estado->slug] as $pedido)
+                            <div class="card mb-2 shadow-sm cursor-move pedido-card border-left-{{ $estado->color }}" data-id="{{ $pedido->id }}">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small text-muted">#{{ $pedido->id }}</span>
+                                        <small class="text-muted">{{ $pedido->created_at->format('d/m H:i') }}</small>
+                                    </div>
+                                    <h6 class="font-weight-bold mb-1 text-dark">{{ $pedido->cliente_nombre }}</h6>
+                                    <p class="mb-2 small text-muted">
+                                        {{ $pedido->items->count() }} items • ${{ number_format($pedido->total, 2) }}
+                                    </p>
+                                    <button class="btn btn-sm btn-outline-secondary btn-block" onclick="verPedido({{ $pedido->id }})">
+                                        Ver Detalle
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
                 </div>
             </div>
-        </div>
         @endforeach
     </div>
 </div>
 
 <!-- Modal Detalle Pedido -->
-<div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade" id="pedidoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Pedido #<span id="modal-pedido-id"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Pedido #<span id="modalPedidoId"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h6 class="fw-bold">Cliente</h6>
-                        <p class="mb-1" id="modal-cliente"></p>
-                        <p class="mb-0 text-muted"><i data-feather="phone" class="feather-sm"></i> <span id="modal-telefono"></span></p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <h6 class="fw-bold">Información</h6>
-                        <p class="mb-1" id="modal-fecha"></p>
-                        <span id="modal-estado" class="badge"></span>
-                    </div>
-                </div>
-
-                <h6 class="fw-bold mb-3">Productos</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Producto</th>
-                                <th class="text-center" width="80">Cant.</th>
-                                <th class="text-end" width="100">Precio</th>
-                                <th class="text-end" width="100">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modal-items"></tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3" class="text-end fw-bold">Total General:</td>
-                                <td class="text-end fw-bold text-success" id="modal-total"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
-                <div id="modal-notas-container" class="alert alert-light mt-3 d-none">
-                    <strong>Notas:</strong> <span id="modal-notas"></span>
-                </div>
+                <p><strong>Cliente:</strong> <span id="modalCliente"></span></p>
+                <p><strong>Teléfono:</strong> <span id="modalTelefono"></span></p>
+                <p><strong>Total:</strong> $<span id="modalTotal"></span></p>
+                <p><strong>Estado:</strong> <span id="modalEstado"></span></p>
+                <hr>
+                <h6>Items:</h6>
+                <ul id="modalItems" class="list-group list-group-flush"></ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<!-- Scripts para Drag & Drop y AJAX -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar Modal
-        const pedidoModal = new bootstrap.Modal(document.getElementById('pedidoModal'));
+    document.addEventListener('DOMContentLoaded', function () {
+        const columns = document.querySelectorAll('.kanban-column');
 
-        const columns = document.querySelectorAll('.kanban-column'); // Seleccionamos las columnas
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        columns.forEach(column => {
-            new Sortable(column, {
-                group: 'kanban', // Permite mover items entre listas del mismo grupo
+        columns.forEach(col => {
+            new Sortable(col, {
+                group: 'pedidos', // Permite mover entre columnas del mismo grupo
                 animation: 150,
-                ghostClass: 'bg-secondary',
-                opacity: 0.5,
-                onEnd: function(evt) {
+                ghostClass: 'bg-secondary', // Clase visual mientras se arrastra
+                onEnd: function (evt) {
                     const itemEl = evt.item;
-                    const newStatusId = evt.to.getAttribute('data-status-id');
-                    const oldStatusId = evt.from.getAttribute('data-status-id');
-                    const orderId = itemEl.getAttribute('data-id');
+                    const newEstadoId = evt.to.getAttribute('data-estado-id');
+                    const pedidoId = itemEl.getAttribute('data-id');
 
-                    if (newStatusId === oldStatusId) return;
+                    // Si no cambió de columna, no hacemos nada
+                    if (evt.from === evt.to) return;
 
-                    updateBadgeCount(evt.from);
-                    updateBadgeCount(evt.to);
-
-                    updateOrderStatus(orderId, newStatusId);
+                    // Llamada AJAX para actualizar el estado
+                    fetch(`/admin/pedidos/${pedidoId}/estado`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ estado_id: newEstadoId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('Error al actualizar el estado. Recarga la página.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
                 }
             });
         });
-
-        function updateBadgeCount(columnEl) {
-            const statusId = columnEl.getAttribute('data-status-id');
-            const count = columnEl.children.length;
-            const badge = document.querySelector(`.count-badge[data-status-id="${statusId}"]`);
-            if (badge) badge.textContent = count;
-        }
-
-        function updateOrderStatus(orderId, statusId) {
-            // Usamos la ruta nombrada correctamente
-            const url = "{{ url('admin/pedidos') }}/" + orderId + "/estado";
-
-            fetch(url, {
-                    method: 'POST', // Usamos POST para coincidir con rutas típicas de acciones
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Token directo de Blade
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        estado_id: statusId
-                    })
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Error en la respuesta de red');
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Estado actualizado:', data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Hubo un error al actualizar el estado. Recarga la página.');
-                });
-        }
-
-        // Evento para abrir el modal
-        document.body.addEventListener('click', function(e) {
-            if (e.target.classList.contains('btn-ver-detalle')) {
-                const btn = e.target;
-                const pedidoId = btn.getAttribute('data-id');
-
-                // Limpiar modal previo
-                document.getElementById('modal-items').innerHTML = '<tr><td colspan="4" class="text-center">Cargando...</td></tr>';
-
-                // Cargar datos
-                fetch("{{ url('admin/pedidos') }}/" + pedidoId)
-                    .then(res => res.json())
-                    .then(data => {
-                        // Header
-                        document.getElementById('modal-pedido-id').textContent = String(data.id).padStart(5, '0');
-                        document.getElementById('modal-cliente').textContent = data.cliente_nombre;
-                        document.getElementById('modal-telefono').textContent = data.cliente_telefono || 'N/A';
-                        document.getElementById('modal-fecha').textContent = new Date(data.created_at).toLocaleString();
-
-                        // Estado
-                        const estadoBadge = document.getElementById('modal-estado');
-                        if(data.estado) {
-                            estadoBadge.textContent = data.estado.nombre;
-                            estadoBadge.className = `badge bg-${data.estado.color}`;
-                        } else {
-                            estadoBadge.textContent = 'Sin Estado';
-                            estadoBadge.className = 'badge bg-secondary';
-                        }
-
-                        // Items
-                        const tbody = document.getElementById('modal-items');
-                        tbody.innerHTML = '';
-                        data.items.forEach(item => {
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td>${item.nombre_snapshot}</td>
-                                    <td class="text-center">${item.cantidad}</td>
-                                    <td class="text-end">$${parseFloat(item.precio_snapshot).toFixed(2)}</td>
-                                    <td class="text-end">$${parseFloat(item.subtotal).toFixed(2)}</td>
-                                </tr>
-                            `;
-                        });
-
-                        // Footer
-                        document.getElementById('modal-total').textContent = '$' + parseFloat(data.total).toFixed(2);
-
-                        // Notas
-                        const notasContainer = document.getElementById('modal-notas-container');
-                        const notasText = document.getElementById('modal-notas');
-                        if (data.notas) {
-                            notasText.textContent = data.notas;
-                            notasContainer.classList.remove('d-none');
-                        } else {
-                            notasContainer.classList.add('d-none');
-                        }
-
-                        pedidoModal.show();
-
-                        // Refrescar iconos feather dentro del modal si es necesario
-                        if(window.feather) feather.replace();
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Error al cargar los detalles del pedido');
-                    });
-            }
-        });
     });
+
+    // Función para ver detalles del pedido en Modal
+    window.verPedido = function(id) {
+        // Resetear modal
+        document.getElementById('modalItems').innerHTML = '<li class="list-group-item">Cargando...</li>';
+        $('#pedidoModal').modal('show');
+
+        fetch(`/admin/pedidos/${id}`)
+            .then(response => response.json())
+            .then(pedido => {
+                document.getElementById('modalPedidoId').innerText = pedido.id;
+                document.getElementById('modalCliente').innerText = pedido.cliente_nombre;
+                document.getElementById('modalTelefono').innerText = pedido.cliente_telefono || '-';
+                document.getElementById('modalTotal').innerText = parseFloat(pedido.total).toFixed(2);
+                document.getElementById('modalEstado').innerText = pedido.estado ? pedido.estado.nombre : '';
+
+                const list = document.getElementById('modalItems');
+                list.innerHTML = '';
+
+                if (pedido.items && pedido.items.length) {
+                    pedido.items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center px-0';
+                        // Se intenta usar 'nombre' (snapshot) o fallback genérico
+                        li.innerHTML = `
+                            <span>${item.cantidad}x ${item.nombre || item.producto_nombre || 'Producto'}</span>
+                            <span>$${parseFloat(item.precio).toFixed(2)}</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                }
+            })
+            .catch(err => console.error(err));
+    };
 </script>
 @endsection

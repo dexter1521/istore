@@ -6,11 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class PedidoEstado extends Model
 {
+    protected $table = 'pedido_estados';
+
     protected $fillable = [
         'nombre',
         'slug',
         'color',
         'orden',
-        'activo'
+        'activo',
+    ];
+
+    protected $casts = [
+        'activo' => 'boolean',
+        'orden' => 'integer',
     ];
 }
