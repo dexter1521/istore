@@ -17,8 +17,10 @@
                     <tr>
                         <th>Producto</th>
                         <th width="120">Cantidad</th>
-                        <th width="120">Precio</th>
-                        <th width="120">Subtotal</th>
+                        @if(show_prices())
+                            <th width="120">Precio</th>
+                            <th width="120">Subtotal</th>
+                        @endif
                         <th width="80"></th>
                     </tr>
                 </thead>
@@ -36,21 +38,26 @@
                                 <input type="number" name="cantidades[{{ $item['id'] }}]" value="{{ $item['cantidad'] }}" min="1"
                                     class="form-control">
                             </td>
-                            <td>${{ number_format($item['precio'], 2) }}</td>
-                            <td>${{ number_format($subtotal, 2) }}</td>
+                            @if(show_prices())
+                                <td>{{ currency_symbol() }}{{ number_format($item['precio'], 2) }}</td>
+                                <td>{{ currency_symbol() }}{{ number_format($subtotal, 2) }}</td>
+                            @endif
                             <td>
-                                <a href="/carrito/eliminar/{{ $item['id'] }}" class="btn btn-sm btn-danger">
-                                    X
-                                </a>
+                                <form method="POST" action="{{ route('carrito.eliminar', $item['id']) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-danger">X</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
 
-            <div class="text-end mb-3">
-                <h4>Total: ${{ number_format($total, 2) }}</h4>
-            </div>
+            @if(show_prices())
+                <div class="text-end mb-3">
+                    <h4>Total: {{ currency_symbol() }}{{ number_format($total, 2) }}</h4>
+                </div>
+            @endif
 
             <button class="btn btn-warning">Actualizar carrito</button>
 

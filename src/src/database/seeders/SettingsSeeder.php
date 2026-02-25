@@ -15,7 +15,7 @@ class SettingsSeeder extends Seeder
     {
         $settings = [
             [
-                'clave' => 'negocio_nombre',
+                'clave' => 'nombre_negocio',
                 'valor' => 'Mi Negocio',
                 'descripcion' => 'Nombre que aparece en el sitio y WhatsApp',
             ],
@@ -27,18 +27,18 @@ class SettingsSeeder extends Seeder
             [
                 'clave' => 'wa_template',
                 'valor' =>
-                    "Hola, soy *{cliente}*\nMi teléfono: {telefono}\n\nQuiero cotizar:\n{items}\n\nTotal estimado: \${total}\nGracias.",
+                "Hola, soy *{cliente}*\nMi teléfono: {telefono}\n\nQuiero cotizar:\n{items}\n\nTotal estimado: \${total}\nGracias.",
                 'descripcion' => 'Plantilla del mensaje WhatsApp',
             ],
             [
-                'clave' => 'moneda_simbolo',
-                'valor' => '$',
-                'descripcion' => 'Símbolo de moneda',
+                'clave' => 'moneda',
+                'valor' => 'USD',
+                'descripcion' => 'Código de moneda (USD, MXN, EUR)',
             ],
             [
-                'clave' => 'mostrar_precio',
+                'clave' => 'mostrar_precios',
                 'valor' => '1',
-                'descripcion' => 'Default global mostrar precio',
+                'descripcion' => 'Mostrar precios en la tienda',
             ],
         ];
 

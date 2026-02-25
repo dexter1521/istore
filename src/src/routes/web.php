@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Services\WhatsAppService;
 use App\Models\Pedido;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Http\Request;
 
 // Public Routes (Sprint 1 & 2)
 Route::get('/', [CatalogoController::class, 'index'])->name('home');
@@ -19,9 +21,11 @@ Route::get('/categoria/{id}', [CatalogoController::class, 'categoria'])->name('c
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
 Route::post('/carrito/agregar', [CarritoController::class, 'agregar'])->name('carrito.agregar');
 Route::post('/carrito/actualizar', [CarritoController::class, 'actualizar'])->name('carrito.actualizar');
-Route::get('/carrito/eliminar/{id}', [CarritoController::class, 'eliminar'])->name('carrito.eliminar');
+Route::post('/carrito/eliminar/{id}', [CarritoController::class, 'eliminar'])->name('carrito.eliminar');
 
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->middleware('throttle:checkout')
+    ->name('checkout.store');
 
 Route::get('/checkout/whatsapp/{id}', function ($id, WhatsAppService $wa) {
     $pedido = Pedido::with('items')->findOrFail($id);
@@ -46,6 +50,13 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class);
     Route::post('/productos/import', [\App\Http\Controllers\Admin\ProductoController::class, 'import'])->name('productos.import');
+    Route::get('/productos/template', function () {
+        $path = base_path('project/import-template.xlsx');
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->download($path, 'import-template.xlsx');
+    })->name('productos.template');
     Route::resource('categorias', \App\Http\Controllers\Admin\CategoriaController::class);
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
@@ -56,3 +67,8 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
 });
 
 require __DIR__ . '/auth.php';
+
+RateLimiter::for('checkout', function (Request $request) {
+    $key = $request->ip();
+    return \Illuminate\Cache\RateLimiting\Limit::perMinute(20)->by($key);
+});

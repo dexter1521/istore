@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pedido;
+use App\Models\PedidoEstado;
 use App\Models\PedidoItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
@@ -26,25 +28,35 @@ class CheckoutController extends Controller
             return $item['precio'] * $item['cantidad'];
         });
 
-        // Crear pedido
-        $pedido = Pedido::create([
-            'cliente_nombre'   => $request->cliente_nombre,
-            'cliente_telefono' => $request->cliente_telefono,
-            'total'            => $total,
-            'estado'           => 'nuevo',
-        ]);
+        $pedido = null;
 
-        // Crear items snapshot
-        foreach ($carrito as $item) {
-            PedidoItem::create([
-                'pedido_id'       => $pedido->id,
-                'producto_id'     => $item['id'],
-                'nombre_snapshot' => $item['nombre'],
-                'precio_snapshot' => $item['precio'],
-                'cantidad'        => $item['cantidad'],
-                'subtotal'        => $item['precio'] * $item['cantidad'],
+        DB::transaction(function () use ($request, $carrito, $total, &$pedido) {
+            $estadoId = PedidoEstado::where('slug', 'pendiente')->value('id');
+            if (!$estadoId) {
+                $estadoId = PedidoEstado::orderBy('orden')->value('id');
+            }
+
+            // Crear pedido
+            $pedido = Pedido::create([
+                'cliente_nombre'   => $request->cliente_nombre,
+                'cliente_telefono' => $request->cliente_telefono,
+                'total'            => $total,
+                'estado_id'        => $estadoId,
+                'estado'           => 'nuevo',
             ]);
-        }
+
+            // Crear items snapshot
+            foreach ($carrito as $item) {
+                PedidoItem::create([
+                    'pedido_id'       => $pedido->id,
+                    'producto_id'     => $item['id'],
+                    'nombre_snapshot' => $item['nombre'],
+                    'precio_snapshot' => $item['precio'],
+                    'cantidad'        => $item['cantidad'],
+                    'subtotal'        => $item['precio'] * $item['cantidad'],
+                ]);
+            }
+        });
 
         // Limpiar carrito
         session()->forget('carrito');

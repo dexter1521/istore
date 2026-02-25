@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pedido_estado', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        // No-op: el proyecto usa la tabla `pedido_estados`.
+        // Se deja este archivo para compatibilidad histórica sin crear tablas duplicadas.
     }
 
     /**
@@ -22,6 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pedido_estado');
+        // No-op.
     }
 };

@@ -25,8 +25,24 @@ class ProductoController extends Controller
         ]);
 
         try {
-            Excel::import(new ProductosImport, $request->file('file'));
-            return redirect()->route('admin.productos.index')->with('success', 'Productos importados exitosamente.');
+            $import = new ProductosImport();
+            Excel::import($import, $request->file('file'));
+
+            $failures = $import->failures();
+            if ($failures->count() > 0) {
+                $first = $failures->first();
+                $firstInfo = '';
+                if ($first) {
+                    $firstInfo = ' (primera fila: ' . $first->row() . ')';
+                }
+                return redirect()
+                    ->route('admin.productos.index')
+                    ->with('error', 'ImportaciÃ³n finalizada con errores en ' . $failures->count() . ' fila(s)' . $firstInfo . '. Revisa el archivo.');
+            }
+
+            return redirect()
+                ->route('admin.productos.index')
+                ->with('success', 'Productos importados exitosamente.');
         } catch (\Exception $e) {
             return redirect()->route('admin.productos.index')->with('error', 'Error al importar: ' . $e->getMessage());
         }
