@@ -10,7 +10,7 @@
         </button>
         <a href="{{ route('admin.productos.template') }}" class="btn btn-sm btn-outline-secondary me-2">
             <span data-feather="download"></span>
-            Descargar Plantilla
+            Descargar Plantilla CSV
         </a>
         <a href="{{ route('admin.productos.create') }}" class="btn btn-sm btn-outline-primary">
             <span data-feather="plus"></span>
@@ -52,7 +52,7 @@
                     <div class="alert alert-info">
                         <strong>Formato esperado:</strong><br>
                         Columnas: <code>sku</code>, <code>nombre</code>, <code>descripcion</code>, <code>precio</code>,
-                        <code>categoria</code>, <code>activo</code>, <code>mostrar_precio</code>
+                        <code>categoria</code>, <code>activo</code>
                     </div>
                     <div class="small text-muted">
                         Tip: usa la plantilla para evitar errores de formato.

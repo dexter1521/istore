@@ -37,7 +37,7 @@ class ProductoController extends Controller
                 }
                 return redirect()
                     ->route('admin.productos.index')
-                    ->with('error', 'ImportaciÃ³n finalizada con errores en ' . $failures->count() . ' fila(s)' . $firstInfo . '. Revisa el archivo.');
+                    ->with('error', 'ImportaciÃƒÂ³n finalizada con errores en ' . $failures->count() . ' fila(s)' . $firstInfo . '. Revisa el archivo.');
             }
 
             return redirect()
@@ -63,7 +63,6 @@ class ProductoController extends Controller
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string',
             'activo' => 'boolean',
-            'mostrar_precio' => 'boolean',
             'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
@@ -85,6 +84,7 @@ class ProductoController extends Controller
 
     public function edit(Producto $producto)
     {
+        $producto->load('imagenes');
         $categorias = Categoria::all();
         return view('admin.productos.edit', compact('producto', 'categorias'));
     }
@@ -93,12 +93,10 @@ class ProductoController extends Controller
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
-            'sku' => 'required|string|unique:productos,sku,' . $producto->id,
             'categoria_id' => 'required|exists:categorias,id',
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string',
             'activo' => 'boolean',
-            'mostrar_precio' => 'boolean',
             'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 

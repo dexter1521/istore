@@ -18,7 +18,6 @@ class Producto extends Model
         'nombre',
         'descripcion',
         'precio',
-        'mostrar_precio',
         'categoria_id',
         'activo',
     ];

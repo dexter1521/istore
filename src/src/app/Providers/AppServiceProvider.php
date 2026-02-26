@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         // Compartir las categorías activas con todas las vistas
         View::composer('*', function ($view) {
             $categorias = Categoria::where('activo', 1)->orderBy('nombre')->get();
-            $view->with('categorias', $categorias);
+            $view->with('categoriasMenu', $categorias);
         });
     }
 }

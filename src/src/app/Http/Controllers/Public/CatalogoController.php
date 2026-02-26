@@ -14,7 +14,7 @@ class CatalogoController extends Controller
         $categoriaId = $request->query('categoria');
 
         $productos = Producto::where('activo', 1)
-            ->with('categoria')
+            ->with(['categoria', 'imagenes'])
             ->when($categoriaId, function ($query, $categoriaId) {
                 return $query->where('categoria_id', $categoriaId);
             })

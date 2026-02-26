@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Worksheet ss:Name="Template">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">sku</Data></Cell>
+        <Cell><Data ss:Type="String">nombre</Data></Cell>
+        <Cell><Data ss:Type="String">descripcion</Data></Cell>
+        <Cell><Data ss:Type="String">precio</Data></Cell>
+        <Cell><Data ss:Type="String">categoria</Data></Cell>
+        <Cell><Data ss:Type="String">activo</Data></Cell>
+        <Cell><Data ss:Type="String">mostrar_precio</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">SKU123</Data></Cell>
+        <Cell><Data ss:Type="String">Producto Ejemplo</Data></Cell>
+        <Cell><Data ss:Type="String">Descripción corta</Data></Cell>
+        <Cell><Data ss:Type="Number">12.5</Data></Cell>
+        <Cell><Data ss:Type="String">Categoría Ejemplo</Data></Cell>
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

@@ -9,14 +9,25 @@ use App\Services\WhatsAppService;
 use App\Models\Pedido;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 // Public Routes (Sprint 1 & 2)
 Route::get('/', [CatalogoController::class, 'index'])->name('home');
 Route::get('/producto/{id}', [CatalogoController::class, 'show'])->name('producto.show');
 
-// Ruta pública para mostrar/filtrar por categoría
+// Ruta pÃƒÆ’Ã‚Âºblica para mostrar/filtrar por categorÃƒÆ’Ã‚Â­a
 Route::get('/categoria/{id}', [CatalogoController::class, 'categoria'])->name('categorias.show');
+
+Route::get('/media/{path}', function (string $path) {
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+    return Storage::disk('public')->response($path);
+})->where('path', '.*')->name('media.show');
 
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
 Route::post('/carrito/agregar', [CarritoController::class, 'agregar'])->name('carrito.agregar');
@@ -48,14 +59,30 @@ Route::middleware('auth')->group(function () {
 // Admin Routes (Sprint 3)
 Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class);
+    Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class)->except(['show']);
     Route::post('/productos/import', [\App\Http\Controllers\Admin\ProductoController::class, 'import'])->name('productos.import');
     Route::get('/productos/template', function () {
-        $path = base_path('project/import-template.xlsx');
+        $path = resource_path('templates/import-template.csv');
         if (!file_exists($path)) {
-            abort(404);
+            $path = base_path('resources/templates/import-template.csv');
         }
-        return response()->download($path, 'import-template.xlsx');
+
+        if (file_exists($path)) {
+            return response()->download($path, 'import-template.csv', [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]);
+        }
+
+        // Fallback para entornos donde el archivo no esta montado en contenedor.
+        $csv = implode("\n", [
+            'sku,nombre,descripcion,precio,categoria,activo',
+            'SKU123,Producto Ejemplo,Descripcion corta,12.50,Categoria Ejemplo,1',
+        ]) . "\n";
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="import-template.csv"',
+        ]);
     })->name('productos.template');
     Route::resource('categorias', \App\Http\Controllers\Admin\CategoriaController::class);
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');

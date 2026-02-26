@@ -43,7 +43,6 @@ class ProductosImport implements
             'precio' => $this->normalizePrice($row['precio'] ?? null),
             'categoria_id' => $categoria->id,
             'activo' => $this->normalizeBool($row['activo'] ?? null, true),
-            'mostrar_precio' => $this->normalizeBool($row['mostrar_precio'] ?? null, true),
         ]);
     }
 
@@ -116,7 +115,7 @@ class ProductosImport implements
         }
 
         $v = Str::lower(trim((string) $value));
-        if (in_array($v, ['1', 'true', 'si', 's�', 'yes', 'y'], true)) {
+        if (in_array($v, ['1', 'true', 'si', 'sÃ­', 'yes', 'y'], true)) {
             return true;
         }
         if (in_array($v, ['0', 'false', 'no', 'n'], true)) {
@@ -126,3 +125,4 @@ class ProductosImport implements
         return $default;
     }
 }
+

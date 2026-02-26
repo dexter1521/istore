@@ -1,7 +1,7 @@
 <?php
-// Genera un archivo .xlsx en formato XML (Excel 2003 Spreadsheet XML) a partir de project/import-template.csv
-$csvPath = __DIR__ . '/../project/import-template.csv';
-$outPath = __DIR__ . '/../project/import-template.xlsx';
+// Genera un archivo .xlsx en formato XML (Excel 2003 Spreadsheet XML) a partir de resources/templates/import-template.csv
+$csvPath = __DIR__ . '/../src/src/resources/templates/import-template.csv';
+$outPath = __DIR__ . '/../src/src/resources/templates/import-template.xlsx';
 if (!file_exists($csvPath)) {
     echo "Archivo CSV de plantilla no encontrado: $csvPath\n";
     exit(1);
