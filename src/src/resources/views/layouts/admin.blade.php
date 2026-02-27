@@ -71,7 +71,7 @@
             z-index: 1030;
         }
 
-        /* Posicionamiento del botón hamburguesa en móviles */
+        /* Posicionamiento del botÃ³n hamburguesa en mÃ³viles */
         .navbar .navbar-toggler {
             top: .25rem;
             right: 1rem;
@@ -109,7 +109,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <a class="nav-link px-3" href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); this.closest('form').submit();">Cerrar Sesión</a>
+                        onclick="event.preventDefault(); this.closest('form').submit();">Cerrar SesiÃ³n</a>
                 </form>
             </div>
         </div>
@@ -141,13 +141,13 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.categorias.index') }}">
                                 <span data-feather="layers"></span>
-                                Categorías
+                                CategorÃ­as
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.settings.index') }}">
                                 <span data-feather="settings"></span>
-                                Configuración
+                                ConfiguraciÃ³n
                             </a>
                         </li>
                     </ul>

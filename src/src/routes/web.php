@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 Route::get('/', [CatalogoController::class, 'index'])->name('home');
 Route::get('/producto/{id}', [CatalogoController::class, 'show'])->name('producto.show');
 
-// Ruta pÃƒÆ’Ã‚Âºblica para mostrar/filtrar por categorÃƒÆ’Ã‚Â­a
+// Ruta pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblica para mostrar/filtrar por categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
 Route::get('/categoria/{id}', [CatalogoController::class, 'categoria'])->name('categorias.show');
 
 Route::get('/media/{path}', function (string $path) {
@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
 // Admin Routes (Sprint 3)
 Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
     Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class)->except(['show']);
     Route::post('/productos/import', [\App\Http\Controllers\Admin\ProductoController::class, 'import'])->name('productos.import');
     Route::get('/productos/template', function () {
