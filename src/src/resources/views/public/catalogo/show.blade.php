@@ -10,8 +10,10 @@
             <div class="carousel-inner">
                 @foreach($producto->imagenes as $index => $imagen)
                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ route('media.show', ['path' => $imagen->path]) }}" class="d-block w-100 rounded"
-                                    alt="{{ $producto->nombre }}">
+                                <img src="{{ route('media.show', ['path' => $imagen->path]) }}"
+                                    class="d-block w-100 rounded"
+                                    alt="{{ $producto->nombre }}"
+                                    style="height: 420px; object-fit: cover;">
                 </div>
                 @endforeach
             </div>

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\CarritoController;
@@ -23,10 +23,15 @@ Route::get('/media/{path}', function (string $path) {
     if (str_contains($path, '..')) {
         abort(404);
     }
-    if (!Storage::disk('public')->exists($path)) {
+    $disk = Storage::disk('public');
+    if (!$disk->exists($path)) {
         abort(404);
     }
-    return Storage::disk('public')->response($path);
+    $mime = $disk->mimeType($path) ?: 'application/octet-stream';
+    return response($disk->get($path), 200, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
 })->where('path', '.*')->name('media.show');
 
 Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
@@ -63,6 +68,8 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
         ->name('users.reset-password');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
     Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class)->except(['show']);
+    Route::delete('productos/{producto}/imagenes/{imagen}', [\App\Http\Controllers\Admin\ProductoController::class, 'destroyImagen'])
+        ->name('productos.imagenes.destroy');
     Route::post('/productos/import', [\App\Http\Controllers\Admin\ProductoController::class, 'import'])->name('productos.import');
     Route::get('/productos/template', function () {
         $path = resource_path('templates/import-template.csv');

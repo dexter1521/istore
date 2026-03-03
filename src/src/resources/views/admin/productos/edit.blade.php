@@ -43,8 +43,13 @@
         <label class="form-label">Imágenes Actuales</label>
         <div class="row">
             @foreach($producto->imagenes as $imagen)
-            <div class="col-md-3 mb-2">
-                <img src="{{ route('media.show', ['path' => $imagen->path]) }}" class="img-thumbnail" alt="Imagen producto">
+            <div class="col-md-3 mb-2 text-center">
+                <img src="{{ route('media.show', ['path' => $imagen->path]) }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Imagen producto">
+                <form action="{{ route('admin.productos.imagenes.destroy', [$producto, $imagen]) }}" method="POST" class="mt-2" data-confirm="Eliminar esta imagen?">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                </form>
             </div>
             @endforeach
         </div>
