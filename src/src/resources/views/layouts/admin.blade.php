@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 
 <head>
@@ -71,7 +71,7 @@
             z-index: 1030;
         }
 
-        /* Posicionamiento del botÃ³n hamburguesa en mÃ³viles */
+        /* Posicionamiento del botÃƒÂ³n hamburguesa en mÃƒÂ³viles */
         .navbar .navbar-toggler {
             top: .25rem;
             right: 1rem;
@@ -109,7 +109,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <a class="nav-link px-3" href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); this.closest('form').submit();">Cerrar SesiÃ³n</a>
+                        onclick="event.preventDefault(); this.closest('form').submit();">Cerrar Sesión</a>
                 </form>
             </div>
         </div>
@@ -121,33 +121,33 @@
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url('/admin/dashboard') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" aria-current="page" href="{{ url('/admin/dashboard') }}">
                                 <span data-feather="home"></span>
                                 Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.pedidos.kanban') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}" href="{{ route('admin.pedidos.kanban') }}">
                                 <span data-feather="shopping-cart"></span>
                                 Pedidos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.productos.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.productos.*') ? 'active' : '' }}" href="{{ route('admin.productos.index') }}">
                                 <span data-feather="shopping-bag"></span>
                                 Productos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.categorias.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}" href="{{ route('admin.categorias.index') }}">
                                 <span data-feather="layers"></span>
-                                CategorÃ­as
+                                Categorías
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.settings.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
                                 <span data-feather="settings"></span>
-                                ConfiguraciÃ³n
+                                Configuración
                             </a>
                         </li>
                     </ul>
@@ -162,9 +162,65 @@
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    @if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Exito',
+                text: @json(session('success')),
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+    @endif
+    @if(session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: 'Error',
+                text: @json(session('error')),
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+    @endif
     <script>
         feather.replace()
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form[data-confirm]').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    if (form.dataset.confirmed === '1') return;
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Confirmar',
+                        text: form.dataset.confirm,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Si',
+                        cancelButtonText: 'Cancelar'
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            form.dataset.confirmed = '1';
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 </body>
 

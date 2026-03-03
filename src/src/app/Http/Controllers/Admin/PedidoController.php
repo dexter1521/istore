@@ -15,15 +15,20 @@ class PedidoController extends Controller
     public function kanban()
     {
         $request = request();
+        $limpiar = $request->boolean('limpiar');
         $desde = $request->query('desde');
         $hasta = $request->query('hasta');
-        $dias = (int) $request->query('dias', 30);
-        if ($dias < 1 || $dias > 365) {
+        $dias = $request->filled('dias') ? (int) $request->query('dias') : null;
+
+        if (!$limpiar && $dias !== null && ($dias < 1 || $dias > 365)) {
             $dias = 30;
         }
 
         // Obtener estados dinámicos desde la BD
-        $estados = PedidoEstado::where('activo', true)->orderBy('orden')->get();
+        $estados = PedidoEstado::where('activo', true)
+            ->whereIn('slug', ['pendiente', 'proceso', 'finalizado'])
+            ->orderBy('orden')
+            ->get();
 
         // Optimización: Cargar todos los pedidos relevantes en una sola consulta (Eager Loading)
         // Filtramos por fecha para evitar cargar todo el historial histórico en el tablero
@@ -31,7 +36,11 @@ class PedidoController extends Controller
             ->whereIn('estado_id', $estados->pluck('id'))
             ->orderByDesc('created_at');
 
-        if ($desde || $hasta) {
+        if ($limpiar) {
+            $desde = null;
+            $hasta = null;
+            $dias = null;
+        } elseif ($desde || $hasta) {
             if ($desde) {
                 $query->whereDate('created_at', '>=', $desde);
             }
@@ -39,7 +48,11 @@ class PedidoController extends Controller
                 $query->whereDate('created_at', '<=', $hasta);
             }
         } else {
-            $query->where('created_at', '>=', now()->subDays($dias)); // Solo últimos N días en Kanban
+            $dias = $dias ?? 30;
+            $desde = now()->subDays($dias)->toDateString();
+            $hasta = now()->toDateString();
+            $query->whereDate('created_at', '>=', $desde)
+                ->whereDate('created_at', '<=', $hasta);
         }
 
         $pedidos = $query->get();
@@ -73,6 +86,9 @@ class PedidoController extends Controller
             'cliente_telefono' => $pedido->cliente_telefono,
             'total' => $pedido->total,
             'estado' => $pedido->estado,
+            'surtido_por' => $pedido->surtido_por,
+            'revisado_por' => $pedido->revisado_por,
+            'folio_mbp' => $pedido->folio_mbp,
             'items' => $pedido->items->map(function ($item) {
                 return [
                     'cantidad' => $item->cantidad,
@@ -97,9 +113,35 @@ class PedidoController extends Controller
             'estado_id' => 'required|exists:pedido_estados,id',
         ]);
 
+        $estado = PedidoEstado::findOrFail($data['estado_id']);
+
+        if ($estado->slug === 'proceso') {
+            $extra = $request->validate([
+                'surtido_por' => 'required|string|max:120',
+                'revisado_por' => 'required|string|max:120',
+            ]);
+            $data = array_merge($data, $extra);
+        }
+
+        if ($estado->slug === 'finalizado') {
+            $extra = $request->validate([
+                'folio_mbp' => 'required|string|max:120',
+            ]);
+            $data = array_merge($data, $extra);
+        }
+
         DB::transaction(function () use ($pedido, $data) {
             // Actualizar estado
             $pedido->estado_id = $data['estado_id'];
+            if (array_key_exists('surtido_por', $data)) {
+                $pedido->surtido_por = $data['surtido_por'];
+            }
+            if (array_key_exists('revisado_por', $data)) {
+                $pedido->revisado_por = $data['revisado_por'];
+            }
+            if (array_key_exists('folio_mbp', $data)) {
+                $pedido->folio_mbp = $data['folio_mbp'];
+            }
             $pedido->save();
 
             // Registrar historial

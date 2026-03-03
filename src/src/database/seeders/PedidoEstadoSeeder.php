@@ -12,6 +12,8 @@ class PedidoEstadoSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('pedido_estados')->update(['activo' => false]);
+
         $estados = [
             [
                 'nombre' => 'Pendiente',
@@ -21,38 +23,17 @@ class PedidoEstadoSeeder extends Seeder
                 'activo' => true,
             ],
             [
-                'nombre' => 'Confirmado',
-                'slug' => 'confirmado',
-                'color' => 'info',
+                'nombre' => 'Proceso',
+                'slug' => 'proceso',
+                'color' => 'primary',
                 'orden' => 20,
                 'activo' => true,
             ],
             [
-                'nombre' => 'En Preparación',
-                'slug' => 'en-preparacion',
-                'color' => 'primary',
-                'orden' => 30,
-                'activo' => true,
-            ],
-            [
-                'nombre' => 'Enviado',
-                'slug' => 'enviado',
-                'color' => 'secondary',
-                'orden' => 40,
-                'activo' => true,
-            ],
-            [
-                'nombre' => 'Entregado',
-                'slug' => 'entregado',
+                'nombre' => 'Finalizado',
+                'slug' => 'finalizado',
                 'color' => 'success',
-                'orden' => 50,
-                'activo' => true,
-            ],
-            [
-                'nombre' => 'Cancelado',
-                'slug' => 'cancelado',
-                'color' => 'danger',
-                'orden' => 99,
+                'orden' => 30,
                 'activo' => true,
             ],
         ];

@@ -16,6 +16,9 @@ class Pedido extends Model
         'total',
         'estado_id',
         'estado',
+        'surtido_por',
+        'revisado_por',
+        'folio_mbp',
         'enviado_whatsapp',
         'notas',
     ];

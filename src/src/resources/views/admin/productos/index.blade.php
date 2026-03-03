@@ -18,21 +18,6 @@
         </a>
     </div>
 </div>
-
-@if(session('success'))
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    {{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
-
-@if(session('error'))
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ session('error') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
-
 <!-- Import Modal -->
 <div class="modal fade" id="importModal" tabindex="-1">
     <div class="modal-dialog">
@@ -99,7 +84,7 @@
                     <a href="{{ route('admin.productos.edit', $producto) }}"
                         class="btn btn-sm btn-outline-secondary">Editar</a>
                     <form action="{{ route('admin.productos.destroy', $producto) }}" method="POST" class="d-inline"
-                        onsubmit="return confirm('¿Estás seguro?');">
+                        data-confirm="Estas seguro?">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
