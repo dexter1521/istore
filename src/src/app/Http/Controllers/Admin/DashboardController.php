@@ -34,8 +34,8 @@ class DashboardController extends Controller
             ->get();
 
         $resumenEstados = Pedido::leftJoin('pedido_estados', 'pedidos.estado_id', '=', 'pedido_estados.id')
-            ->selectRaw('COALESCE(pedido_estados.nombre, pedidos.estado) as nombre, COALESCE(pedido_estados.color, \"secondary\") as color, COUNT(*) as total')
-            ->groupBy('nombre', 'color')
+            ->selectRaw("COALESCE(pedido_estados.nombre, pedidos.estado) as nombre, COALESCE(pedido_estados.color, 'secondary') as color, COUNT(*) as total")
+            ->groupByRaw("COALESCE(pedido_estados.nombre, pedidos.estado), COALESCE(pedido_estados.color, 'secondary')")
             ->orderByDesc('total')
             ->get();
 

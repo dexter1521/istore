@@ -107,8 +107,8 @@
                                     <td>{{ $pedido->cliente_nombre }}</td>
                                     <td>
                                         @php
-                                            $estadoNombre = $pedido->estado ? $pedido->estado->nombre : $pedido->estado;
-                                            $estadoColor = $pedido->estado ? $pedido->estado->color : 'secondary';
+                                            $estadoNombre = is_object($pedido->estado) ? $pedido->estado->nombre : $pedido->estado;
+                                            $estadoColor = is_object($pedido->estado) ? $pedido->estado->color : 'secondary';
                                         @endphp
                                         <span class="badge bg-{{ $estadoColor }}">{{ $estadoNombre }}</span>
                                     </td>
