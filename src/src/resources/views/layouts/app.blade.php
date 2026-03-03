@@ -26,23 +26,20 @@
 </head>
 
 <body class="bg-light">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        @include('layouts.navigation')
+    @include('layouts.navigation')
 
-        <!-- Page Heading -->
-        @isset($header)
-        <header class="bg-white dark:bg-gray-800 shadow">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Page Content -->
+    <main class="py-4">
+        <div class="container">
+            @isset($header)
+            <div class="mb-4">
                 {{ $header }}
             </div>
-        </header>
-        @endisset
+            @endisset
 
-        <!-- Page Content -->
-        <main>
             {{ $slot }}
-        </main>
-    </div>
+        </div>
+    </main>
 </body>
 
 </html>

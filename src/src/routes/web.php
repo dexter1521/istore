@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\CarritoController;
@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
-// Public Routes (Sprint 1 & 2)
+// Public Routes
 Route::get('/', [CatalogoController::class, 'index'])->name('home');
 Route::get('/producto/{id}', [CatalogoController::class, 'show'])->name('producto.show');
 
-// Ruta pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblica para mostrar/filtrar por categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+// Ruta publica para mostrar/filtrar por categoria
 Route::get('/categoria/{id}', [CatalogoController::class, 'categoria'])->name('categorias.show');
 
 Route::get('/media/{path}', function (string $path) {
@@ -45,7 +45,7 @@ Route::get('/checkout/whatsapp/{id}', function ($id, WhatsAppService $wa) {
     return redirect()->away($url);
 })->name('checkout.whatsapp');
 
-// Auth Routes (Breeze)
+// Auth Routes
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -56,9 +56,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Admin Routes (Sprint 3)
+// Admin Routes
 Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('users/{user}/reset-password', [\App\Http\Controllers\Admin\UserController::class, 'resetPassword'])
+        ->name('users.reset-password');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
     Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class)->except(['show']);
     Route::post('/productos/import', [\App\Http\Controllers\Admin\ProductoController::class, 'import'])->name('productos.import');
