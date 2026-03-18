@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="row">
+<div class="row g-4">
     <!-- Product Images -->
     <div class="col-md-6 mb-4">
         @if($producto->imagenes->count() > 0)
@@ -10,10 +10,10 @@
             <div class="carousel-inner">
                 @foreach($producto->imagenes as $index => $imagen)
                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ route('media.show', ['path' => $imagen->path]) }}"
-                                    class="d-block w-100 rounded"
-                                    alt="{{ $producto->nombre }}"
-                                    style="height: 420px; object-fit: cover;">
+                    <img src="{{ route('media.show', ['path' => $imagen->path]) }}"
+                        class="d-block w-100 rounded"
+                        alt="{{ $producto->nombre }}"
+                        style="height: 420px; object-fit: cover;">
                 </div>
                 @endforeach
             </div>
@@ -30,7 +30,7 @@
         </div>
         @else
         <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
-            <span class="text-muted fs-1">📦</span>
+            <span class="text-muted fs-1">&box;</span>
         </div>
         @endif
     </div>
@@ -87,12 +87,12 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
-                🛒 Agregar al Carrito
+                Agregar al carrito
             </button>
         </form>
 
         <a href="{{ route('home') }}" class="btn btn-outline-secondary w-100">
-            ← Volver al Catálogo
+            &larr; Volver al catálogo
         </a>
     </div>
 </div>

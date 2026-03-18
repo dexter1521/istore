@@ -6,16 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 use App\Models\PedidoEstado;
 use App\Models\PedidoItem;
-use App\Models\Producto;
-use App\Models\Categoria;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $productosActivos = Producto::where('activo', 1)->count();
-        $categoriasActivas = Categoria::where('activo', 1)->count();
-
         $estadoPendienteId = PedidoEstado::where('slug', 'pendiente')->value('id');
         $pedidosPendientes = Pedido::when(
             $estadoPendienteId,
@@ -46,8 +41,6 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
-            'productosActivos',
-            'categoriasActivas',
             'pedidosPendientes',
             'pedidosTotal',
             'pedidosHoy',

@@ -1,175 +1,136 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ config('app.name', 'iStore') }} Admin</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
     <style>
-        body {
-            font-size: .875rem;
-        }
-
-        .feather {
-            width: 16px;
-            height: 16px;
-            vertical-align: text-bottom;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 56px 0 0;
-            /* Altura del navbar */
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            overflow-y: auto;
-        }
-
-        @media (max-width: 767.98px) {
-            .sidebar {
-                top: 0;
-                width: 100%;
-                height: auto;
-                background-color: #f8f9fa;
-                border-bottom: 1px solid #dee2e6;
-            }
-        }
-
-        .nav-link {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .nav-link .feather {
-            margin-right: 4px;
-            color: #727272;
-        }
-
-        .nav-link.active {
-            color: #007bff;
-        }
-
-        .nav-link.active .feather {
-            color: inherit;
-        }
-
-        .nav-link:hover .feather,
-        .nav-link.active .feather {
-            color: inherit;
-        }
-
-        /* Asegurar que el header quede por encima y la sidebar no solape el contenido */
-        header.navbar {
-            z-index: 1030;
-        }
-
-        /* Posicionamiento del botÃƒÂ³n hamburguesa en mÃƒÂ³viles */
-        .navbar .navbar-toggler {
-            top: .25rem;
-            right: 1rem;
-        }
-
-        /* Ancho fijo de la sidebar en pantallas medias/anchas y dejar espacio al main */
-        @media (min-width: 768px) {
-            .sidebar {
-                width: 240px;
-            }
-
-            main {
-                margin-left: 240px;
-            }
-        }
-
-        /* Espaciado para el contenido principal */
-        main {
-            padding-top: 56px;
-        }
+        .gap-2 { gap: .5rem; }
+        .gap-3 { gap: 1rem; }
+        .badge[class*='bg-'] { color: #fff; }
+        .g-2 { margin-right: -.5rem; margin-left: -.5rem; }
+        .g-2 > [class^='col'], .g-2 > [class*=' col'] { padding-right: .5rem; padding-left: .5rem; }
     </style>
+    @stack('styles')
 </head>
 
-<body>
+<body id="page-top">
+    <div id="wrapper">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('admin.dashboard') }}">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">iStore Admin</div>
+            </a>
 
-    <header class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">iStore Admin</a>
-        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-nav">
-            <div class="nav-item text-nowrap">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <a class="nav-link px-3" href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); this.closest('form').submit();">Cerrar Sesión</a>
-                </form>
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">
+                Gestión
             </div>
-        </div>
-    </header>
 
-    <div class="container-fluid">
-        <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
+            <li class="nav-item {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.pedidos.kanban') }}">
+                    <i class="fas fa-fw fa-shopping-cart"></i>
+                    <span>Pedidos</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ request()->routeIs('admin.productos.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.productos.index') }}">
+                    <i class="fas fa-fw fa-box"></i>
+                    <span>Productos</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.categorias.index') }}">
+                    <i class="fas fa-fw fa-tags"></i>
+                    <span>Categorías</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.users.index') }}">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Usuarios</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.settings.index') }}">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Configuración</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <span class="navbar-brand d-none d-sm-inline-block mb-0 text-gray-700">Panel administrativo</span>
+
+                    <ul class="navbar-nav ml-auto">
+                        <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" aria-current="page" href="{{ url('/admin/dashboard') }}">
-                                <span data-feather="home"></span>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}" href="{{ route('admin.pedidos.kanban') }}">
-                                <span data-feather="shopping-cart"></span>
-                                Pedidos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.productos.*') ? 'active' : '' }}" href="{{ route('admin.productos.index') }}">
-                                <span data-feather="shopping-bag"></span>
-                                Productos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}" href="{{ route('admin.categorias.index') }}">
-                                <span data-feather="layers"></span>
-                                Categorías
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
-                                <span data-feather="users"></span>
-                                Usuarios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
-                                <span data-feather="settings"></span>
-                                Configuración
-                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="btn btn-sm btn-outline-secondary" type="submit">
+                                    <i class="fas fa-sign-out-alt mr-1"></i>
+                                    Cerrar sesión
+                                </button>
+                            </form>
                         </li>
                     </ul>
-                </div>
-            </nav>
+                </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                @yield('content')
-            </main>
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
+            </div>
+
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="text-center my-auto">
+                        <span>&copy; {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
     @if(session('success'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -177,7 +138,7 @@
                 toast: true,
                 position: 'top-end',
                 icon: 'success',
-                title: 'Exito',
+                title: 'Éxito',
                 text: @json(session('success')),
                 showConfirmButton: false,
                 timer: 3000,
@@ -203,9 +164,6 @@
     </script>
     @endif
     <script>
-        feather.replace()
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('form[data-confirm]').forEach(function(form) {
                 form.addEventListener('submit', function(e) {
@@ -228,6 +186,7 @@
             });
         });
     </script>
+    @stack('scripts')
 </body>
 
 </html>

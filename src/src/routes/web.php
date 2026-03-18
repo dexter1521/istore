@@ -1,19 +1,29 @@
-<?php
+﻿<?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\CarritoController;
-use App\Http\Controllers\Public\CheckoutController;
 use App\Http\Controllers\Public\CatalogoController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Services\WhatsAppService;
+use App\Http\Controllers\Public\CheckoutController;
 use App\Models\Pedido;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Producto;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 // Public Routes
-Route::get('/', [CatalogoController::class, 'index'])->name('home');
+Route::get('/', function () {
+    $productosDestacados = Producto::with('imagenes')
+        ->where('activo', 1)
+        ->latest()
+        ->take(8)
+        ->get();
+
+    return view('landing', compact('productosDestacados'));
+})->name('home');
+Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
 Route::get('/producto/{id}', [CatalogoController::class, 'show'])->name('producto.show');
 
 // Ruta publica para mostrar/filtrar por categoria

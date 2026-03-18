@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h2 class="mb-3">Catálogo de Productos</h2>
+<h2 class="mb-4">Catálogo de productos</h2>
 
 @php
 $filtroNombre = null;
@@ -24,19 +24,19 @@ $filtroCategoria = $cat ? $cat->nombre : null;
 <p class="text-muted mb-4">Resultados @if($filtroNombre) para {{ $filtroNombre }}@endif @if($filtroCategoria) @if($filtroNombre) en @else para @endif la categoría "{{ $filtroCategoria }}"@endif</p>
 @endif
 
-<div class="row">
+<div class="row g-4">
     @forelse($productos as $producto)
-    <div class="col-md-3 mb-4">
+    <div class="col-md-3 col-sm-6">
         <div class="card h-100 shadow-sm">
             @php
             $imagenPrincipal = $producto->imagenes->sortBy('orden')->first();
             @endphp
 
             @if($imagenPrincipal)
-                        <img src="{{ route('media.show', ['path' => $imagenPrincipal->path]) }}"
-                            class="card-img-top"
-                            alt="{{ $producto->nombre }}"
-                            style="height: 180px; object-fit: cover;">
+            <img src="{{ route('media.show', ['path' => $imagenPrincipal->path]) }}"
+                class="card-img-top"
+                alt="{{ $producto->nombre }}"
+                style="height: 180px; object-fit: cover;">
             @else
             <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
                 <span class="text-muted">Sin imagen</span>

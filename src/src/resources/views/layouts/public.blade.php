@@ -10,6 +10,7 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    @stack('styles')
     <!-- Bootstrap JS bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Feather icons -->
@@ -21,7 +22,7 @@
     </script>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     @php
         $carritoCount = collect(session('carrito', []))->sum('cantidad');
     @endphp
@@ -38,6 +39,9 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('catalogo.index') }}">Catálogo</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Categorías</a>
@@ -60,22 +64,8 @@
                             <span class="badge rounded-pill bg-primary {{ $carritoCount > 0 ? '' : 'd-none' }}">{{ $carritoCount }}</span>
                         </a>
                     </li>
-                    @auth
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/dashboard') }}">Dashboard</a>
-                    </li>
-                    @else
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
-                    </li>
-                    @if (Route::has('register'))
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Registrarse</a>
-                    </li>
-                    @endif
-                    @endauth
                 </ul>
-                <form class="d-flex" method="GET" action="{{ route('home') }}">
+                <form class="d-flex" method="GET" action="{{ route('catalogo.index') }}">
                     @if(request()->has('categoria'))
                     <input type="hidden" name="categoria" value="{{ request('categoria') }}">
                     @endif
@@ -87,7 +77,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="py-4">
+    <main class="py-4 pb-5 flex-grow-1">
         <div class="container">
             @if(session('success'))
             <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
@@ -106,9 +96,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light mt-5 py-4">
+    <footer class="bg-light mt-auto py-3 border-top">
         <div class="container text-center text-muted">
             <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name') }}. Todos los derechos reservados.</p>
+            @auth
+                <a class="nav-link d-inline-block" href="{{ url('/dashboard') }}">Dashboard</a>
+            @else
+                <a class="nav-link d-inline-block" href="{{ route('login') }}">Iniciar Sesión</a>
+            @endauth
         </div>
     </footer>
     <script>
@@ -122,6 +117,7 @@
             }
         });
     </script>
+    @stack('scripts')
 </body>
 
 </html>
