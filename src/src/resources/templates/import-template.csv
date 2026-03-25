@@ -1,2 +1,2 @@
-sku,nombre,descripcion,precio,categoria,activo,mostrar_precio
-SKU123,Producto Ejemplo,"Descripción corta",12.50,Categoría Ejemplo,1,1
+sku,nombre,descripcion,precio1,precio2,precio3,precio4,precio5,cantidad2,cantidad3,cantidad4,cantidad5,unidad_medida,categoria,activo
+SKU123,Producto Ejemplo,Descripci?n corta,12.50,11.00,10.00,,,15,25,,,pieza,Categor?a Ejemplo,1

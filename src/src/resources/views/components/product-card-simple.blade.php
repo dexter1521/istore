@@ -23,7 +23,7 @@
 
         @if(show_prices())
             <div class="text-success fw-bold mb-2">
-                {{ currency_symbol() }}{{ number_format($producto->precio ?? 0, 2) }}
+                {{ currency_symbol() }}{{ number_format($producto->getPrecioPorCantidad(1) ?? 0, 2) }}
             </div>
         @endif
 

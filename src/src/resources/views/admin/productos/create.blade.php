@@ -21,8 +21,8 @@
                 <input type="text" class="form-control" id="nombre" name="nombre" required>
             </div>
             <div class="form-group">
-                <label for="precio">Precio</label>
-                <input type="number" class="form-control" id="precio" name="precio" step="0.01" required>
+                <label for="precio1">Precio base (precio 1)</label>
+                <input type="number" class="form-control" id="precio1" name="precio1" step="0.01" required>
             </div>
             <div class="form-group">
                 <label for="categoria_id">Categoría</label>
@@ -35,6 +35,43 @@
             <div class="form-group">
                 <label for="descripcion">Descripción</label>
                 <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="unidad_medida">Unidad de medida</label>
+                <input type="text" class="form-control" id="unidad_medida" name="unidad_medida" maxlength="50" placeholder="Ej. pieza, kg, caja">
+            </div>
+
+            <div class="form-group">
+                <label>Niveles de precio</label>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Desde cantidad</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="number" class="form-control" name="cantidad2" min="1" placeholder="Cantidad 2"></td>
+                                <td><input type="number" class="form-control" name="precio2" step="0.01" placeholder="Precio 2"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" class="form-control" name="cantidad3" min="1" placeholder="Cantidad 3"></td>
+                                <td><input type="number" class="form-control" name="precio3" step="0.01" placeholder="Precio 3"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" class="form-control" name="cantidad4" min="1" placeholder="Cantidad 4"></td>
+                                <td><input type="number" class="form-control" name="precio4" step="0.01" placeholder="Precio 4"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" class="form-control" name="cantidad5" min="1" placeholder="Cantidad 5"></td>
+                                <td><input type="number" class="form-control" name="precio5" step="0.01" placeholder="Precio 5"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted">Las cantidades deben ser ascendentes. Si defines una cantidad, debes definir su precio.</small>
             </div>
             <div class="form-group">
                 <label for="imagenes">Imágenes</label>

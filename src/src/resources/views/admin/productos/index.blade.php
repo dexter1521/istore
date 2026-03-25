@@ -32,7 +32,8 @@
                         <th>ID</th>
                         <th>SKU</th>
                         <th>Nombre</th>
-                        <th>Precio</th>
+                        <th>Precio base</th>
+                        <th>Unidad</th>
                         <th>Categoría</th>
                         <th>Activo</th>
                         <th>Acciones</th>
@@ -64,8 +65,10 @@
                     </div>
                     <div class="alert alert-info">
                         <strong>Formato esperado:</strong><br>
-                        Columnas: <code>sku</code>, <code>nombre</code>, <code>descripcion</code>, <code>precio</code>,
-                        <code>categoria</code>, <code>activo</code>
+                        Columnas: <code>sku</code>, <code>nombre</code>, <code>descripcion</code>, <code>precio1</code>,
+                        <code>precio2</code>, <code>precio3</code>, <code>precio4</code>, <code>precio5</code>,
+                        <code>cantidad2</code>, <code>cantidad3</code>, <code>cantidad4</code>, <code>cantidad5</code>,
+                        <code>unidad_medida</code>, <code>categoria</code>, <code>activo</code>
                     </div>
                     <div class="small text-muted">Tip: usa la plantilla para evitar errores de formato.</div>
                 </div>
@@ -100,6 +103,13 @@
                     render: function(data) {
                         const val = parseFloat(data || 0).toFixed(2);
                         return '{{ currency_symbol() }}' + val;
+                    }
+                },
+                {
+                    data: 'unidad',
+                    name: 'unidad',
+                    render: function(data) {
+                        return data ? data : '-';
                     }
                 },
                 { data: 'categoria', name: 'categoria' },

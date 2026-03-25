@@ -36,11 +36,27 @@ class ProductosImport implements
         $nombreCategoria = $this->normalizeString($row['categoria'] ?? null) ?? 'Sin Categoria';
         $categoria = $this->getOrCreateCategoria($nombreCategoria);
 
+        $precio1 = $this->normalizePrice($row['precio1'] ?? $row['precio'] ?? null);
+        $precio2 = $this->normalizePrice($row['precio2'] ?? null);
+        $precio3 = $this->normalizePrice($row['precio3'] ?? null);
+        $precio4 = $this->normalizePrice($row['precio4'] ?? null);
+        $precio5 = $this->normalizePrice($row['precio5'] ?? null);
+
         return new Producto([
             'sku' => $this->normalizeString($row['sku'] ?? null),
             'nombre' => $this->normalizeString($row['nombre'] ?? null),
             'descripcion' => $this->normalizeString($row['descripcion'] ?? null),
-            'precio' => $this->normalizePrice($row['precio'] ?? null),
+            'precio' => $precio1,
+            'precio1' => $precio1,
+            'precio2' => $precio2,
+            'precio3' => $precio3,
+            'precio4' => $precio4,
+            'precio5' => $precio5,
+            'cantidad2' => $this->normalizeInt($row['cantidad2'] ?? null),
+            'cantidad3' => $this->normalizeInt($row['cantidad3'] ?? null),
+            'cantidad4' => $this->normalizeInt($row['cantidad4'] ?? null),
+            'cantidad5' => $this->normalizeInt($row['cantidad5'] ?? null),
+            'unidad_medida' => $this->normalizeString($row['unidad_medida'] ?? null),
             'categoria_id' => $categoria->id,
             'activo' => $this->normalizeBool($row['activo'] ?? null, true),
         ]);
@@ -52,6 +68,15 @@ class ProductosImport implements
             'sku' => 'required|string|max:100',
             'nombre' => 'required|string|max:255',
             'precio' => 'nullable|numeric|min:0',
+            'precio1' => 'nullable|numeric|min:0',
+            'precio2' => 'nullable|numeric|min:0',
+            'precio3' => 'nullable|numeric|min:0',
+            'precio4' => 'nullable|numeric|min:0',
+            'precio5' => 'nullable|numeric|min:0',
+            'cantidad2' => 'nullable|integer|min:1',
+            'cantidad3' => 'nullable|integer|min:1',
+            'cantidad4' => 'nullable|integer|min:1',
+            'cantidad5' => 'nullable|integer|min:1',
         ];
     }
 
@@ -77,6 +102,24 @@ class ProductosImport implements
     public function chunkSize(): int
     {
         return 200;
+    }
+
+    public function prepareForValidation($data, $index)
+    {
+        $data['sku'] = $this->normalizeString($data['sku'] ?? null);
+        $data['nombre'] = $this->normalizeString($data['nombre'] ?? null);
+        $data['precio'] = $this->normalizePrice($data['precio'] ?? null);
+        $data['precio1'] = $this->normalizePrice($data['precio1'] ?? null);
+        $data['precio2'] = $this->normalizePrice($data['precio2'] ?? null);
+        $data['precio3'] = $this->normalizePrice($data['precio3'] ?? null);
+        $data['precio4'] = $this->normalizePrice($data['precio4'] ?? null);
+        $data['precio5'] = $this->normalizePrice($data['precio5'] ?? null);
+        $data['cantidad2'] = $this->normalizeInt($data['cantidad2'] ?? null);
+        $data['cantidad3'] = $this->normalizeInt($data['cantidad3'] ?? null);
+        $data['cantidad4'] = $this->normalizeInt($data['cantidad4'] ?? null);
+        $data['cantidad5'] = $this->normalizeInt($data['cantidad5'] ?? null);
+
+        return $data;
     }
 
     private function getOrCreateCategoria(string $nombre): Categoria
@@ -119,6 +162,15 @@ class ProductosImport implements
         }
         $value = str_replace(',', '.', (string) $value);
         return (float) $value;
+    }
+
+    private function normalizeInt($value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (int) $value;
     }
 
     private function normalizeBool($value, bool $default): bool

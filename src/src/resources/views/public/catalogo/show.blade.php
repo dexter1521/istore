@@ -60,7 +60,10 @@
 
         @if(show_prices())
         <h3 class="text-success mb-4">
-            {{ currency_symbol() }}{{ number_format($producto->precio ?? 0, 2) }}
+            {{ currency_symbol() }}{{ number_format($producto->getPrecioPorCantidad(1) ?? 0, 2) }}
+            @if($producto->unidad_medida)
+                <small class="text-muted">/ {{ $producto->unidad_medida }}</small>
+            @endif
         </h3>
         @endif
 
@@ -68,6 +71,50 @@
         <div class="mb-4">
             <h5>Descripción</h5>
             <p class="text-muted">{{ $producto->descripcion }}</p>
+        </div>
+        @endif
+
+        @php
+            $tieneTiers = collect([
+                ['cantidad' => $producto->cantidad2, 'precio' => $producto->precio2],
+                ['cantidad' => $producto->cantidad3, 'precio' => $producto->precio3],
+                ['cantidad' => $producto->cantidad4, 'precio' => $producto->precio4],
+                ['cantidad' => $producto->cantidad5, 'precio' => $producto->precio5],
+            ])->filter(fn($tier) => !empty($tier['cantidad']) && $tier['precio'] !== null)->count() > 0;
+        @endphp
+
+        @if(show_prices() && $tieneTiers)
+        <div class="mb-4">
+            <h5>Precios por cantidad</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Desde</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 {{ $producto->unidad_medida ?? 'unidad' }}</td>
+                            <td>{{ currency_symbol() }}{{ number_format($producto->getPrecioPorCantidad(1), 2) }}</td>
+                        </tr>
+                        @foreach([
+                            ['cantidad' => $producto->cantidad2, 'precio' => $producto->precio2],
+                            ['cantidad' => $producto->cantidad3, 'precio' => $producto->precio3],
+                            ['cantidad' => $producto->cantidad4, 'precio' => $producto->precio4],
+                            ['cantidad' => $producto->cantidad5, 'precio' => $producto->precio5],
+                        ] as $tier)
+                            @if(!empty($tier['cantidad']) && $tier['precio'] !== null)
+                                <tr>
+                                    <td>{{ $tier['cantidad'] }} {{ $producto->unidad_medida ?? 'unidades' }}</td>
+                                    <td>{{ currency_symbol() }}{{ number_format($tier['precio'], 2) }}</td>
+                                </tr>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
         @endif
 

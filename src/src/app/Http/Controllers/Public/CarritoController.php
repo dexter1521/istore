@@ -23,12 +23,14 @@ class CarritoController extends Controller
 
         if (isset($carrito[$producto->id])) {
             $carrito[$producto->id]['cantidad']++;
+            $carrito[$producto->id]['precio'] = $producto->getPrecioPorCantidad($carrito[$producto->id]['cantidad']);
         } else {
             $carrito[$producto->id] = [
                 'id'       => $producto->id,
                 'nombre'   => $producto->nombre,
-                'precio'   => $producto->precio,
+                'precio'   => $producto->getPrecioPorCantidad(1),
                 'cantidad' => 1,
+                'unidad'   => $producto->unidad_medida,
             ];
         }
 
@@ -55,6 +57,10 @@ class CarritoController extends Controller
         foreach ($request->cantidades as $id => $cantidad) {
             if (isset($carrito[$id])) {
                 $carrito[$id]['cantidad'] = max(1, (int)$cantidad);
+                $producto = Producto::find($id);
+                if ($producto) {
+                    $carrito[$id]['precio'] = $producto->getPrecioPorCantidad($carrito[$id]['cantidad']);
+                }
             }
         }
 

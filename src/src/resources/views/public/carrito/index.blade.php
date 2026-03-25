@@ -33,7 +33,11 @@
                             $total += $subtotal;
                         @endphp
                         <tr>
-                            <td>{{ $item['nombre'] }}</td>
+                            <td>{{ $item['nombre'] }}
+                                @if(!empty($item['unidad']))
+                                    <div class="small text-muted">Unidad: {{ $item['unidad'] }}</div>
+                                @endif
+                            </td>
                             <td>
                                 <input type="number" name="cantidades[{{ $item['id'] }}]" value="{{ $item['cantidad'] }}" min="1"
                                     class="form-control">

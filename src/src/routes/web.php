@@ -97,8 +97,8 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
 
         // Fallback para entornos donde el archivo no esta montado en contenedor.
         $csv = implode("\n", [
-            'sku,nombre,descripcion,precio,categoria,activo',
-            'SKU123,Producto Ejemplo,Descripcion corta,12.50,Categoria Ejemplo,1',
+            'sku,nombre,descripcion,precio1,precio2,precio3,precio4,precio5,cantidad2,cantidad3,cantidad4,cantidad5,unidad_medida,categoria,activo',
+            'SKU123,Producto Ejemplo,Descripcion corta,12.50,11.00,10.00,,,15,25,,,pieza,Categoria Ejemplo,1',
         ]) . "\n";
 
         return response($csv, 200, [

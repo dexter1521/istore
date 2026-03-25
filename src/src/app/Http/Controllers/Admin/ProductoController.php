@@ -8,6 +8,7 @@ use App\Models\Categoria;
 use App\Models\ProductoImagen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductosImport;
 use Illuminate\Support\Str;
@@ -31,9 +32,10 @@ class ProductoController extends Controller
             0 => 'productos.id',
             1 => 'productos.sku',
             2 => 'productos.nombre',
-            3 => 'productos.precio',
-            4 => 'categoria_nombre',
-            5 => 'productos.activo',
+            3 => 'productos.precio1',
+            4 => 'productos.unidad_medida',
+            5 => 'categoria_nombre',
+            6 => 'productos.activo',
         ];
 
         $baseQuery = Producto::query()
@@ -69,7 +71,8 @@ class ProductoController extends Controller
                 'id' => $producto->id,
                 'sku' => $producto->sku,
                 'nombre' => $producto->nombre,
-                'precio' => $producto->precio,
+                'precio' => $producto->precio1 ?? $producto->precio,
+                'unidad' => $producto->unidad_medida,
                 'categoria' => $producto->categoria_nombre ?? '-',
                 'activo' => (bool) $producto->activo,
             ];
@@ -122,16 +125,11 @@ class ProductoController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'sku' => 'required|string|unique:productos,sku',
-            'categoria_id' => 'required|exists:categorias,id',
-            'precio' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string',
-            'activo' => 'boolean',
-            'imagenes' => 'nullable|array|max:3',
-            'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        $request->merge([
+            'precio1' => $request->input('precio1', $request->input('precio')),
         ]);
+        $validated = $this->validateProducto($request, true);
+        $validated['precio'] = $validated['precio1'];
 
         $producto = Producto::create($validated);
 
@@ -162,15 +160,11 @@ class ProductoController extends Controller
 
     public function update(Request $request, Producto $producto)
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'categoria_id' => 'required|exists:categorias,id',
-            'precio' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string',
-            'activo' => 'boolean',
-            'imagenes' => 'nullable|array|max:3',
-            'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        $request->merge([
+            'precio1' => $request->input('precio1', $request->input('precio')),
         ]);
+        $validated = $this->validateProducto($request, false, $producto->id);
+        $validated['precio'] = $validated['precio1'];
 
         $producto->update($validated);
 
@@ -269,5 +263,68 @@ class ProductoController extends Controller
         Storage::disk('public')->put($filename, $binary);
 
         return $filename;
+    }
+
+    private function validateProducto(Request $request, bool $isCreate, ?int $productoId = null): array
+    {
+        $rules = [
+            'nombre' => 'required|string|max:255',
+            'sku' => $isCreate
+                ? 'required|string|unique:productos,sku'
+                : 'nullable|string|unique:productos,sku,' . $productoId,
+            'categoria_id' => 'required|exists:categorias,id',
+            'descripcion' => 'nullable|string',
+            'unidad_medida' => 'nullable|string|max:50',
+            'precio1' => 'required|numeric|min:0',
+            'precio2' => 'nullable|numeric|min:0',
+            'precio3' => 'nullable|numeric|min:0',
+            'precio4' => 'nullable|numeric|min:0',
+            'precio5' => 'nullable|numeric|min:0',
+            'cantidad2' => 'nullable|integer|min:1',
+            'cantidad3' => 'nullable|integer|min:1',
+            'cantidad4' => 'nullable|integer|min:1',
+            'cantidad5' => 'nullable|integer|min:1',
+            'activo' => 'boolean',
+            'imagenes' => 'nullable|array|max:3',
+            'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        $validator->after(function ($validator) use ($request) {
+            $cantidades = [];
+            for ($i = 2; $i <= 5; $i++) {
+                $cantidadKey = 'cantidad' . $i;
+                $precioKey = 'precio' . $i;
+                $cantidad = $request->input($cantidadKey);
+                $precio = $request->input($precioKey);
+
+                if ($cantidad !== null || $precio !== null) {
+                    if ($cantidad === null || $cantidad === '') {
+                        $validator->errors()->add($cantidadKey, 'La cantidad es requerida cuando hay precio.');
+                    }
+                    if ($precio === null || $precio === '') {
+                        $validator->errors()->add($precioKey, 'El precio es requerido cuando hay cantidad.');
+                    }
+                }
+
+                if ($cantidad !== null && $cantidad !== '') {
+                    $cantidades[] = (int) $cantidad;
+                }
+            }
+
+            if (count($cantidades) > 1) {
+                $sorted = $cantidades;
+                sort($sorted);
+                if ($sorted !== $cantidades) {
+                    $validator->errors()->add('cantidad2', 'Las cantidades deben ir en orden ascendente.');
+                }
+                if (count($sorted) !== count(array_unique($sorted))) {
+                    $validator->errors()->add('cantidad2', 'Las cantidades no deben repetirse.');
+                }
+            }
+        });
+
+        return $validator->validate();
     }
 }

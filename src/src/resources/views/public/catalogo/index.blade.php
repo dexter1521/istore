@@ -52,7 +52,7 @@ $filtroCategoria = $cat ? $cat->nombre : null;
 
                 @if(show_prices())
                 <p class="text-success fw-bold">
-                    {{ currency_symbol() }}{{ number_format($producto->precio ?? 0, 2) }}
+                    {{ currency_symbol() }}{{ number_format($producto->getPrecioPorCantidad(1) ?? 0, 2) }}
                 </p>
                 @endif
 
