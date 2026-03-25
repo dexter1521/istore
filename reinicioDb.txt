@@ -1,0 +1,41 @@
+-- reinicia operación
+
+START TRANSACTION;
+
+DELETE FROM pedido_historial;
+ALTER TABLE pedido_historial AUTO_INCREMENT = 1;
+
+DELETE FROM pedido_items;
+ALTER TABLE pedido_items AUTO_INCREMENT = 1;
+
+DELETE FROM pedidos;
+ALTER TABLE pedidos AUTO_INCREMENT = 1;
+
+DELETE FROM producto_imagenes;
+ALTER TABLE producto_imagenes AUTO_INCREMENT = 1;
+
+DELETE FROM productos;
+ALTER TABLE productos AUTO_INCREMENT = 1;
+
+DELETE FROM categorias;
+ALTER TABLE categorias AUTO_INCREMENT = 1;
+
+COMMIT;
+
+-- ultima migracion --
+
+ALTER TABLE productos
+  ADD COLUMN precio1 DECIMAL(10,2) NULL AFTER precio,
+  ADD COLUMN precio2 DECIMAL(10,2) NULL AFTER precio1,
+  ADD COLUMN precio3 DECIMAL(10,2) NULL AFTER precio2,
+  ADD COLUMN precio4 DECIMAL(10,2) NULL AFTER precio3,
+  ADD COLUMN precio5 DECIMAL(10,2) NULL AFTER precio4,
+  ADD COLUMN cantidad2 INT NULL AFTER precio5,
+  ADD COLUMN cantidad3 INT NULL AFTER cantidad2,
+  ADD COLUMN cantidad4 INT NULL AFTER cantidad3,
+  ADD COLUMN cantidad5 INT NULL AFTER cantidad4,
+  ADD COLUMN unidad_medida VARCHAR(50) NULL AFTER cantidad5;
+
+UPDATE productos
+SET precio1 = precio
+WHERE precio1 IS NULL;
