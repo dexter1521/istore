@@ -2,19 +2,19 @@
 
 namespace App\Imports;
 
-use App\Models\Producto;
 use App\Models\Categoria;
+use App\Models\Producto;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithUpserts;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
-use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithUpserts;
+use Maatwebsite\Excel\Concerns\WithValidation;
 
 class ProductosImport implements
     ToModel,
@@ -55,6 +55,15 @@ class ProductosImport implements
         ];
     }
 
+    public function prepareForValidation($data, $index)
+    {
+        $data['sku'] = $this->normalizeString($data['sku'] ?? null);
+        $data['nombre'] = $this->normalizeString($data['nombre'] ?? null);
+        $data['precio'] = $this->normalizePrice($data['precio'] ?? null);
+
+        return $data;
+    }
+
     public function uniqueBy()
     {
         return 'sku';
@@ -77,10 +86,18 @@ class ProductosImport implements
             return $this->categoriaCache[$key];
         }
 
-        $categoria = Categoria::firstOrCreate(
-            ['nombre' => $nombre],
-            ['slug' => Str::slug($nombre)]
-        );
+        $slug = Str::slug($nombre);
+        $categoria = Categoria::query()
+            ->whereRaw('LOWER(slug) = ?', [Str::lower($slug)])
+            ->orWhereRaw('LOWER(nombre) = ?', [Str::lower($nombre)])
+            ->first();
+
+        if (!$categoria) {
+            $categoria = Categoria::create([
+                'nombre' => $nombre,
+                'slug' => $slug,
+            ]);
+        }
 
         $this->categoriaCache[$key] = $categoria;
         return $categoria;
@@ -115,7 +132,7 @@ class ProductosImport implements
         }
 
         $v = Str::lower(trim((string) $value));
-        if (in_array($v, ['1', 'true', 'si', 'sÃ­', 'yes', 'y'], true)) {
+        if (in_array($v, ['1', 'true', 'si', 'sí', 'yes', 'y'], true)) {
             return true;
         }
         if (in_array($v, ['0', 'false', 'no', 'n'], true)) {
@@ -125,4 +142,3 @@ class ProductosImport implements
         return $default;
     }
 }
-
