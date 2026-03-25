@@ -22,59 +22,26 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Listado de productos</h6>
-        <span class="text-muted small">{{ $productos->total() }} registros</span>
+        <span class="text-muted small">Usa búsqueda y filtros de la tabla</span>
     </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped table-sm mb-0">
+            <table class="table table-striped table-sm" id="productosTable" width="100%">
                 <thead class="thead-light">
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">SKU</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Precio</th>
-                        <th scope="col">Categoría</th>
-                        <th scope="col">Activo</th>
-                        <th scope="col">Acciones</th>
+                        <th>ID</th>
+                        <th>SKU</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($productos as $producto)
-                    <tr>
-                        <td>{{ $producto->id }}</td>
-                        <td>{{ $producto->sku }}</td>
-                        <td>{{ $producto->nombre }}</td>
-                        <td>{{ currency_symbol() }}{{ number_format($producto->precio, 2) }}</td>
-                        <td>{{ $producto->categoria ? $producto->categoria->nombre : '-' }}</td>
-                        <td>
-                            @if($producto->activo)
-                            <span class="badge badge-success">Si</span>
-                            @else
-                            <span class="badge badge-secondary">No</span>
-                            @endif
-                        </td>
-                        <td>
-                            <a href="{{ route('admin.productos.edit', $producto) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                            <form action="{{ route('admin.productos.destroy', $producto) }}" method="POST" class="d-inline" data-confirm="Estas seguro?">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center">No hay productos registrados.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
-</div>
-
-<div class="d-flex justify-content-end">
-    {{ $productos->links() }}
 </div>
 
 <!-- Import Modal -->
@@ -111,3 +78,64 @@
     </div>
 </div>
 @endsection
+
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        $('#productosTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('admin.productos.data') }}'
+            },
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'sku', name: 'sku' },
+                { data: 'nombre', name: 'nombre' },
+                {
+                    data: 'precio',
+                    name: 'precio',
+                    render: function(data) {
+                        const val = parseFloat(data || 0).toFixed(2);
+                        return '{{ currency_symbol() }}' + val;
+                    }
+                },
+                { data: 'categoria', name: 'categoria' },
+                {
+                    data: 'activo',
+                    name: 'activo',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        return data ? '<span class="badge badge-success">Si</span>' : '<span class="badge badge-secondary">No</span>';
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'acciones',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        const editUrl = '{{ url('admin/productos') }}/' + data + '/edit';
+                        const deleteUrl = '{{ url('admin/productos') }}/' + data;
+                        return `
+                            <a href="${editUrl}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <form action="${deleteUrl}" method="POST" class="d-inline" data-confirm="Estas seguro?">
+                                <input type="hidden" name="_token" value="${csrf}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        `;
+                    }
+                }
+            ],
+            order: [[0, 'desc']],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+            }
+        });
+    });
+</script>
+@endpush

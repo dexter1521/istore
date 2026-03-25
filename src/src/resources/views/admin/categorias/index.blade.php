@@ -13,9 +13,9 @@
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Listado de categorías</h6>
     </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped table-sm mb-0">
+            <table class="table table-striped table-sm" id="categoriasTable" width="100%">
                 <thead class="thead-light">
                     <tr>
                         <th>ID</th>
@@ -26,35 +26,61 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($categorias as $categoria)
-                    <tr>
-                        <td>{{ $categoria->id }}</td>
-                        <td>{{ $categoria->nombre }}</td>
-                        <td><code>{{ $categoria->slug }}</code></td>
-                        <td>{{ $categoria->productos_count }}</td>
-                        <td>{{ $categoria->created_at->format('d/m/Y') }}</td>
-                        <td>
-                            <a href="{{ route('admin.categorias.edit', $categoria) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                            <form action="{{ route('admin.categorias.destroy', $categoria) }}" method="POST" class="d-inline" data-confirm="Estas seguro de eliminar esta categoria?">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">No hay categorías registradas.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
 </div>
-
-<div class="d-flex justify-content-end">
-    {{ $categorias->links() }}
-</div>
 @endsection
+
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        $('#categoriasTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('admin.categorias.data') }}'
+            },
+            columns: [
+                { data: 'id', name: 'id' },
+                { data: 'nombre', name: 'nombre' },
+                {
+                    data: 'slug',
+                    name: 'slug',
+                    orderable: false,
+                    render: function(data) {
+                        return '<code>' + data + '</code>';
+                    }
+                },
+                { data: 'productos', name: 'productos' },
+                { data: 'fecha', name: 'fecha' },
+                {
+                    data: 'id',
+                    name: 'acciones',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        const editUrl = '{{ url('admin/categorias') }}/' + data + '/edit';
+                        const deleteUrl = '{{ url('admin/categorias') }}/' + data;
+                        return `
+                            <a href="${editUrl}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <form action="${deleteUrl}" method="POST" class="d-inline" data-confirm="Estas seguro de eliminar esta categoria?">
+                                <input type="hidden" name="_token" value="${csrf}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        `;
+                    }
+                }
+            ],
+            order: [[0, 'desc']],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+            }
+        });
+    });
+</script>
+@endpush

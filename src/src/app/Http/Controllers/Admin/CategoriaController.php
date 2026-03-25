@@ -10,8 +10,63 @@ class CategoriaController extends Controller
 {
     public function index()
     {
-        $categorias = Categoria::withCount('productos')->latest()->paginate(10);
-        return view('admin.categorias.index', compact('categorias'));
+        return view('admin.categorias.index');
+    }
+
+
+    public function data(Request $request)
+    {
+        $draw = (int) $request->input('draw');
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+        $search = $request->input('search.value');
+
+        $columns = [
+            0 => 'categorias.id',
+            1 => 'categorias.nombre',
+            2 => 'categorias.slug',
+            3 => 'productos_count',
+            4 => 'categorias.created_at',
+        ];
+
+        $baseQuery = Categoria::query()->withCount('productos');
+
+        $recordsTotal = (clone $baseQuery)->count();
+
+        if (!empty($search)) {
+            $baseQuery->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = (clone $baseQuery)->count();
+
+        $orderIndex = (int) $request->input('order.0.column', 0);
+        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderCol = $columns[$orderIndex] ?? 'categorias.id';
+
+        $baseQuery->orderBy($orderCol, $orderDir);
+
+        $rows = $baseQuery->skip($start)->take($length)->get();
+
+        $data = $rows->map(function ($categoria) {
+            return [
+                'id' => $categoria->id,
+                'nombre' => $categoria->nombre,
+                'slug' => $categoria->slug,
+                'productos' => $categoria->productos_count,
+                'fecha' => $categoria->created_at->format('d/m/Y'),
+            ];
+        });
+
+        return response()->json([
+
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
     public function create()

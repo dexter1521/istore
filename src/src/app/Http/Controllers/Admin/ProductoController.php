@@ -16,8 +16,72 @@ class ProductoController extends Controller
 {
     public function index()
     {
-        $productos = Producto::with('categoria')->latest()->paginate(10);
-        return view('admin.productos.index', compact('productos'));
+        return view('admin.productos.index');
+    }
+
+
+    public function data(Request $request)
+    {
+        $draw = (int) $request->input('draw');
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+        $search = $request->input('search.value');
+
+        $columns = [
+            0 => 'productos.id',
+            1 => 'productos.sku',
+            2 => 'productos.nombre',
+            3 => 'productos.precio',
+            4 => 'categoria_nombre',
+            5 => 'productos.activo',
+        ];
+
+        $baseQuery = Producto::query()
+            ->leftJoin('categorias as c', 'productos.categoria_id', '=', 'c.id')
+            ->select('productos.*', 'c.nombre as categoria_nombre');
+
+        $recordsTotal = (clone $baseQuery)->count();
+
+        if (!empty($search)) {
+            $baseQuery->where(function ($q) use ($search) {
+                $q->where('productos.sku', 'like', "%{$search}%")
+                    ->orWhere('productos.nombre', 'like', "%{$search}%")
+                    ->orWhere('c.nombre', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = (clone $baseQuery)->count();
+
+        $orderIndex = (int) $request->input('order.0.column', 0);
+        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderCol = $columns[$orderIndex] ?? 'productos.id';
+
+        if ($orderCol === 'categoria_nombre') {
+            $baseQuery->orderBy('c.nombre', $orderDir);
+        } else {
+            $baseQuery->orderBy($orderCol, $orderDir);
+        }
+
+        $rows = $baseQuery->skip($start)->take($length)->get();
+
+        $data = $rows->map(function ($producto) {
+            return [
+                'id' => $producto->id,
+                'sku' => $producto->sku,
+                'nombre' => $producto->nombre,
+                'precio' => $producto->precio,
+                'categoria' => $producto->categoria_nombre ?? '-',
+                'activo' => (bool) $producto->activo,
+            ];
+        });
+
+        return response()->json([
+
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
     public function import(Request $request)

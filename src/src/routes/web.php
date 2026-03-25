@@ -76,7 +76,9 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('users/{user}/reset-password', [\App\Http\Controllers\Admin\UserController::class, 'resetPassword'])
         ->name('users.reset-password');
+    Route::get('users/data', [\App\Http\Controllers\Admin\UserController::class, 'data'])->name('users.data');
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+    Route::get('productos/data', [\App\Http\Controllers\Admin\ProductoController::class, 'data'])->name('productos.data');
     Route::resource('productos', \App\Http\Controllers\Admin\ProductoController::class)->except(['show']);
     Route::delete('productos/{producto}/imagenes/{imagen}', [\App\Http\Controllers\Admin\ProductoController::class, 'destroyImagen'])
         ->name('productos.imagenes.destroy');
@@ -104,6 +106,7 @@ Route::middleware(['auth', 'role:admin|editor'])->prefix('admin')->name('admin.'
             'Content-Disposition' => 'attachment; filename="import-template.csv"',
         ]);
     })->name('productos.template');
+    Route::get('categorias/data', [\App\Http\Controllers\Admin\CategoriaController::class, 'data'])->name('categorias.data');
     Route::resource('categorias', \App\Http\Controllers\Admin\CategoriaController::class);
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
