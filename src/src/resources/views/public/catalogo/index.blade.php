@@ -49,6 +49,9 @@ $filtroCategoria = $cat ? $cat->nombre : null;
                         {{ $producto->nombre }}
                     </a>
                 </h6>
+                @if($producto->sku)
+                <div class="small text-muted mb-1">SKU: {{ $producto->sku }}</div>
+                @endif
 
                 @if(show_prices())
                 <p class="text-success fw-bold">

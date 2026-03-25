@@ -34,6 +34,9 @@
                         @endphp
                         <tr>
                             <td>{{ $item['nombre'] }}
+                                @if(!empty($item['sku']))
+                                    <div class="small text-muted">SKU: {{ $item['sku'] }}</div>
+                                @endif
                                 @if(!empty($item['unidad']))
                                     <div class="small text-muted">Unidad: {{ $item['unidad'] }}</div>
                                 @endif

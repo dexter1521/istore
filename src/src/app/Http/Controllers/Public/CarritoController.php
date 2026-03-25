@@ -30,6 +30,7 @@ class CarritoController extends Controller
                 'nombre'   => $producto->nombre,
                 'precio'   => $producto->getPrecioPorCantidad(1),
                 'cantidad' => 1,
+                'sku'      => $producto->sku,
                 'unidad'   => $producto->unidad_medida,
             ];
         }
