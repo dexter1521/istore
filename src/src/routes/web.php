@@ -23,6 +23,7 @@ Route::get('/', function () {
 
     return view('landing', compact('productosDestacados'));
 })->name('home');
+Route::get('/catalogo/sugerencias', [CatalogoController::class, 'sugerencias'])->name('catalogo.sugerencias');
 Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
 Route::get('/producto/{id}', [CatalogoController::class, 'show'])->name('producto.show');
 

@@ -11,6 +11,17 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     @stack('styles')
+
+    <style>
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+        }
+    </style>
+
     <!-- Bootstrap JS bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Feather icons -->
@@ -65,12 +76,13 @@
                         </a>
                     </li>
                 </ul>
-                <form class="d-flex" method="GET" action="{{ route('catalogo.index') }}">
+                <form class="d-flex position-relative" method="GET" action="{{ route('catalogo.index') }}" autocomplete="off">
                     @if(request()->has('categoria'))
                     <input type="hidden" name="categoria" value="{{ request('categoria') }}">
                     @endif
-                    <input class="form-control me-2" type="search" name="q" value="{{ request('q') }}" placeholder="Buscar">
+                    <input class="form-control me-2" type="search" id="searchInput" name="q" value="{{ request('q') }}" placeholder="Buscar" aria-label="Buscar">
                     <button class="btn btn-primary" type="submit">Buscar</button>
+                    <div id="searchSuggestions" class="list-group search-suggestions"></div>
                 </form>
             </div>
         </div>
@@ -117,6 +129,61 @@
             }
         });
     </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('searchInput');
+            const box = document.getElementById('searchSuggestions');
+            if (!input || !box) return;
+
+            let timer = null;
+
+            const clearBox = () => {
+                box.innerHTML = '';
+                box.style.display = 'none';
+            };
+
+            const render = (items) => {
+                if (!items.length) {
+                    clearBox();
+                    return;
+                }
+                box.innerHTML = items.map(item => {
+                    const sku = item.sku ? `<small class="text-muted">${item.sku}</small>` : '';
+                    return `<a class="list-group-item list-group-item-action" href="${item.url}">${item.nombre} ${sku}</a>`;
+                }).join('');
+                box.style.display = 'block';
+            };
+
+            const fetchSuggestions = async (q) => {
+                const url = new URL("{{ route('catalogo.sugerencias') }}", window.location.origin);
+                url.searchParams.set('q', q);
+                const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return [];
+                return await res.json();
+            };
+
+            input.addEventListener('input', function() {
+                const q = input.value.trim();
+                clearTimeout(timer);
+                if (q.length < 2) {
+                    clearBox();
+                    return;
+                }
+                timer = setTimeout(async () => {
+                    const items = await fetchSuggestions(q);
+                    render(items);
+                }, 200);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!box.contains(e.target) && e.target !== input) {
+                    clearBox();
+                }
+            });
+        });
+    </script>
+
     @stack('scripts')
 </body>
 

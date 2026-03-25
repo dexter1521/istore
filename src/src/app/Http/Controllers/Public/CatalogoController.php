@@ -20,7 +20,8 @@ class CatalogoController extends Controller
             })
             ->when($q, function ($query, $q) {
                 return $query->where(function ($sub) use ($q) {
-                    $sub->where('nombre', 'like', "%{$q}%")
+                    $sub->where('sku', 'like', "%{$q}%")
+                        ->orWhere('nombre', 'like', "%{$q}%")
                         ->orWhere('descripcion', 'like', "%{$q}%");
                 });
             })
@@ -28,6 +29,36 @@ class CatalogoController extends Controller
             ->appends($request->except('page'));
 
         return view('public.catalogo.index', compact('productos'));
+    }
+
+
+    public function sugerencias(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+        if (mb_strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $productos = Producto::where('activo', 1)
+            ->where(function ($sub) use ($q) {
+                $sub->where('sku', 'like', "%{$q}%")
+                    ->orWhere('nombre', 'like', "%{$q}%")
+                    ->orWhere('descripcion', 'like', "%{$q}%");
+            })
+            ->orderBy('nombre')
+            ->limit(8)
+            ->get(['id', 'sku', 'nombre']);
+
+        $result = $productos->map(function ($producto) {
+            return [
+                'id' => $producto->id,
+                'sku' => $producto->sku,
+                'nombre' => $producto->nombre,
+                'url' => route('producto.show', $producto->id),
+            ];
+        });
+
+        return response()->json($result);
     }
 
     /**
