@@ -52,10 +52,10 @@ class ProductosImport implements
             'precio3' => $precio3,
             'precio4' => $precio4,
             'precio5' => $precio5,
-            'cantidad2' => $this->normalizeInt($row['cantidad2'] ?? null),
-            'cantidad3' => $this->normalizeInt($row['cantidad3'] ?? null),
-            'cantidad4' => $this->normalizeInt($row['cantidad4'] ?? null),
-            'cantidad5' => $this->normalizeInt($row['cantidad5'] ?? null),
+            'cantidad2' => $this->normalizeCantidad($row['cantidad2'] ?? null),
+            'cantidad3' => $this->normalizeCantidad($row['cantidad3'] ?? null),
+            'cantidad4' => $this->normalizeCantidad($row['cantidad4'] ?? null),
+            'cantidad5' => $this->normalizeCantidad($row['cantidad5'] ?? null),
             'unidad_medida' => $this->normalizeString($row['unidad_medida'] ?? null),
             'categoria_id' => $categoria->id,
             'activo' => $this->normalizeBool($row['activo'] ?? null, true),
@@ -78,15 +78,6 @@ class ProductosImport implements
             'cantidad4' => 'nullable|integer|min:1',
             'cantidad5' => 'nullable|integer|min:1',
         ];
-    }
-
-    public function prepareForValidation($data, $index)
-    {
-        $data['sku'] = $this->normalizeString($data['sku'] ?? null);
-        $data['nombre'] = $this->normalizeString($data['nombre'] ?? null);
-        $data['precio'] = $this->normalizePrice($data['precio'] ?? null);
-
-        return $data;
     }
 
     public function uniqueBy()
@@ -114,10 +105,10 @@ class ProductosImport implements
         $data['precio3'] = $this->normalizePrice($data['precio3'] ?? null);
         $data['precio4'] = $this->normalizePrice($data['precio4'] ?? null);
         $data['precio5'] = $this->normalizePrice($data['precio5'] ?? null);
-        $data['cantidad2'] = $this->normalizeInt($data['cantidad2'] ?? null);
-        $data['cantidad3'] = $this->normalizeInt($data['cantidad3'] ?? null);
-        $data['cantidad4'] = $this->normalizeInt($data['cantidad4'] ?? null);
-        $data['cantidad5'] = $this->normalizeInt($data['cantidad5'] ?? null);
+        $data['cantidad2'] = $this->normalizeCantidad($data['cantidad2'] ?? null);
+        $data['cantidad3'] = $this->normalizeCantidad($data['cantidad3'] ?? null);
+        $data['cantidad4'] = $this->normalizeCantidad($data['cantidad4'] ?? null);
+        $data['cantidad5'] = $this->normalizeCantidad($data['cantidad5'] ?? null);
 
         return $data;
     }
@@ -164,9 +155,14 @@ class ProductosImport implements
         return (float) $value;
     }
 
-    private function normalizeInt($value): ?int
+    private function normalizeCantidad($value): ?int
     {
         if ($value === null || $value === '') {
+            return null;
+        }
+
+        $value = (float) str_replace(',', '.', (string) $value);
+        if ($value <= 0) {
             return null;
         }
 
