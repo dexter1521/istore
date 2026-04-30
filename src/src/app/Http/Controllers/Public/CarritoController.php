@@ -67,6 +67,25 @@ class CarritoController extends Controller
 
         session()->put('carrito', $carrito);
 
+        if ($request->expectsJson()) {
+            $total = 0;
+            $items = [];
+            foreach ($carrito as $item) {
+                $subtotal = $item['precio'] * $item['cantidad'];
+                $total += $subtotal;
+                $items[$item['id']] = [
+                    'precio' => $item['precio'],
+                    'subtotal' => $subtotal,
+                    'cantidad' => $item['cantidad'],
+                ];
+            }
+            return response()->json([
+                'success' => true,
+                'total' => $total,
+                'items' => $items,
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Carrito actualizado');
     }
 }

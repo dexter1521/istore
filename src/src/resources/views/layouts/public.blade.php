@@ -75,6 +75,11 @@
                             <span class="badge rounded-pill bg-primary {{ $carritoCount > 0 ? '' : 'd-none' }}">{{ $carritoCount }}</span>
                         </a>
                     </li>
+                    @auth
+                    <li class="nav-item">
+                        <span class="nav-link text-muted">Sesión: {{ auth()->user()->name }}</span>
+                    </li>
+                    @endauth
                 </ul>
                 <form class="d-flex position-relative" method="GET" action="{{ route('catalogo.index') }}" autocomplete="off">
                     @if(request()->has('categoria'))
@@ -129,7 +134,7 @@
             }
         });
     </script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('searchInput');

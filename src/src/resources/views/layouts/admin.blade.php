@@ -99,6 +99,14 @@
                     <span class="navbar-brand d-none d-sm-inline-block mb-0 text-gray-700">Panel administrativo</span>
 
                     <ul class="navbar-nav ml-auto">
+
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-outline-primary mr-2" href="{{ route('home') }}" target="_blank">
+                                <i class="fas fa-external-link-alt mr-1"></i>
+                                Ir a la tienda
+                            </a>
+                        </li>
+
                         <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item">
                             <form method="POST" action="{{ route('logout') }}">
